@@ -1,5 +1,6 @@
 <?php 
-require 'concerto.php';
+
+//require 'concerto.php';
 
 class dbConnect
 {
@@ -30,7 +31,7 @@ class dbConnect
         }   
     }
 
-    public function __Insert($concerto)
+    /*public function __Insert($concerto)
     {
         $codice = $concerto->__Get_Codice();
         $titolo = $concerto->__Get_Titolo();
@@ -53,6 +54,6 @@ class dbConnect
             return $ritorno;
         }
         return false;
-    }
+    }*/
 }
 ?>

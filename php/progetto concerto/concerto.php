@@ -2,7 +2,6 @@
 require 'connessione.php';
 class Concerto
 {
-
     private $id;
     private $codice;
     private $titolo;
@@ -51,7 +50,6 @@ class Concerto
             $ritorno = $connessione->lastInsertId();
             $connessione = null; //chiusura connessione
             return $ritorno;
-
         }
         $connessione=null;
         return false;
