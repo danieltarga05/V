@@ -49,7 +49,6 @@ class Concerto
         if($risultato)
         {  
             $ritorno = $connessione->lastInsertId();
-            $concerto->__Set_Id($ritorno);
             $connessione = null; //chiusura connessione
             return $ritorno;
 
