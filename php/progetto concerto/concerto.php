@@ -3,7 +3,7 @@ require 'connessione.php';
 class Concerto
 {
 
-    private $id = 0;
+    private $id;
     private $codice;
     private $titolo;
     private $descrizione;
@@ -11,13 +11,13 @@ class Concerto
 
     public function __construct($codice,$titolo,$desc,$data_concerto)
     {
-        self::$id++;
         $this->__Set_Codice($codice);
         $this->__Set_Titolo($titolo);
         $this->__Set_Descrizione($desc);
         $this->__Set_Data_Concerto($data_concerto);
     }
-    public function __Get_Id(){return self::$id;}
+    private function __Set_Id($var){$this->id=$var;}
+    public function __Get_Id(){return $this->id;}
     public function __Set_Codice($var){$this->codice=$var;}
     public function __Get_Codice(){return $this->codice;}
     public function __Set_Titolo($var){$this->titolo = $var;}
@@ -49,6 +49,7 @@ class Concerto
         if($risultato)
         {  
             $ritorno = $connessione->lastInsertId();
+            $concerto->__Set_Id($ritorno);
             $connessione = null; //chiusura connessione
             return $ritorno;
 

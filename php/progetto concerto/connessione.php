@@ -21,8 +21,8 @@ class dbConnect
     {
         try
         {
-            $this->connessione = new PDO("mysql:dbname={$this->dbname};host={$this->host}", $this->user,$this->password);
-            echo "connesso attivata\n";
+            return  new PDO("mysql:dbname={$this->dbname};host={$this->host}", $this->user,$this->password);
+            //echo "connesso attivata\n";
         }
         catch(PDOException $e)
         {
