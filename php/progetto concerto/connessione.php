@@ -1,4 +1,5 @@
 <?php 
+require 'concerto.php';
 
 class dbConnect
 {
@@ -21,13 +22,38 @@ class dbConnect
     {
         try
         {
-            return new PDO("mysql:dbname={$this->dbname};host={$this->host}", $this->user,$this->password);
-
+            $this->connessione = new PDO("mysql:dbname={$this->dbname};host={$this->host}", $this->user,$this->password);
+            echo "connessione avviata";
         }
         catch(PDOException $e)
         {
             die("connesione fallita : ".$e->getMessage());
+        }   
+    }
+
+    public function __Insert($concerto)
+    {
+        $codice = $concerto->__Get_Codice();
+        $titolo = $concerto->__Get_Titolo();
+        $desc = $concerto->__Get_Descrizione();
+        $data_conc = $concerto->__Get_Data_Concerto();
+        
+        $query = 'insert into progetto_concerto.concerti(codice,titolo,descrizione,data_concerto) 
+                  values (:codice,:titolo,:descrizione,:data_concerto)';
+        $result = $this->connessione->prepare($query);
+        $result->bindParam(':codice',$codice,PDO::PARAM_STR);
+        $result->bindParam(':titolo',$titolo,PDO::PARAM_STR);
+        $result->bindParam(':descrizione',$desc,PDO::PARAM_STR);
+        $result->bindParam(':data_concerto',$data_conc,PDO::PARAM_STR);
+
+        $check_execute = $result->execute();
+        if($check_execute)
+        {
+            $ritorno = $this->connessione->lastInsertId();
+            $this->connessione = null; //chiusura connessione
+            return $ritorno;
         }
+        return false;
     }
 }
 ?>

@@ -30,31 +30,10 @@ class Concerto
     public static function Create($concerto)
     {
         $db = new dbConnect("config.txt");
-        $connessione = $db->__Connessione();
+        $db->__Connessione();
 
-        $codice = $concerto->__Get_Codice();
-        $titolo = $concerto->__Get_Titolo();
-        $desc = $concerto->__Get_Descrizione();
-        $data_conc = $concerto->__Get_Data_Concerto();
-        
-        $query = 'insert into progetto_concerto.concerti(codice,titolo,descrizione,data_concerto) 
-                  values (:codice,:titolo,:descrizione,:data_concerto)';
-        $statement = $connessione->prepare($query);
-        $statement->bindParam(':codice',$codice,PDO::PARAM_STR);
-        $statement->bindParam(':titolo',$titolo,PDO::PARAM_STR);
-        $statement->bindParam(':descrizione',$desc,PDO::PARAM_STR);
-        $statement->bindParam(':data_concerto',$data_conc,PDO::PARAM_STR);
-        
-        $risultato = $statement->execute();
-        if($risultato)
-        {  
-            $ritorno = $connessione->lastInsertId();
-            $connessione = null; //chiusura connessione
-            return $ritorno;
-
-        }
-        $connessione=null;
-        return false;
+        $result = $db->__Insert($concerto);
+        return $result;
     }
 }
 ?>
