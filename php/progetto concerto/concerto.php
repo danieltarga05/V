@@ -54,5 +54,14 @@ class Concerto
         $connessione=null;
         return false;
     }
+
+    public function __Delete()
+    {
+        $this->__Set_Id(null);
+        $this->__Set_Codice(null);
+        $this->__Set_Titolo(null);
+        $this->__Set_Descrizione(null);
+        $this->__Set_Data_Concerto(null);
+    }
 }
 ?>
