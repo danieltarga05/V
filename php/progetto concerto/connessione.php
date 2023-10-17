@@ -21,23 +21,13 @@ class dbConnect
     {
         try
         {
-            $this->connessione = new PDO("mysql:dbname={$this->dbname};host={$this->host}", $this->user,$this->password);
-            echo "connesso attivata\n";
+            return new PDO("mysql:dbname={$this->dbname};host={$this->host}", $this->user,$this->password);
+
         }
         catch(PDOException $e)
         {
             die("connesione fallita : ".$e->getMessage());
         }
-    }
-
-    public function __Prepare($query)
-    {
-        return $this->connessione->prepare($query);
-    }
-
-    public function __Chiusura()
-    {
-        $this->connessione = null;
     }
 }
 ?>
