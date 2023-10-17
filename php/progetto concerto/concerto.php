@@ -2,7 +2,8 @@
 require 'connessione.php';
 class Concerto
 {
-    private static $id = 0;
+
+    private $id = 0;
     private $codice;
     private $titolo;
     private $descrizione;
@@ -29,7 +30,7 @@ class Concerto
     public static function Create($concerto)
     {
         $db = new dbConnect("config.txt");
-        $db->__Connessione();
+        $connessione = $db->__Connessione();
 
         $codice = $concerto->__Get_Codice();
         $titolo = $concerto->__Get_Titolo();
@@ -38,18 +39,21 @@ class Concerto
         
         $query = 'insert into progetto_concerto.concerti(codice,titolo,descrizione,data_concerto) 
                   values (:codice,:titolo,:descrizione,:data_concerto)';
-        $statement = $db->__Prepare($query);
+        $statement = $connessione->prepare($query);
         $statement->bindParam(':codice',$codice,PDO::PARAM_STR);
         $statement->bindParam(':titolo',$titolo,PDO::PARAM_STR);
         $statement->bindParam(':descrizione',$desc,PDO::PARAM_STR);
         $statement->bindParam(':data_concerto',$data_conc,PDO::PARAM_STR);
+        
         $risultato = $statement->execute();
         if($risultato)
         {  
-            $db->__Chiusura();
-            return true;
+            $ritorno = $connessione->lastInsertId();
+            $connessione = null; //chiusura connessione
+            return $ritorno;
+
         }
-        $db->__Chiusura();
+        $connessione=null;
         return false;
     }
 }
