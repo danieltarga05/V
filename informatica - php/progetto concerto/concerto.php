@@ -68,7 +68,7 @@ class Concerto
         $id = $this->__Get_Id();
 
         $query = "delete from progetto_concerto.concerti
-                  where id == :id";
+                  where id = :id";
         $statement = $connessione->prepare($query);
         $statement->bindParam(":id",$id,PDO::PARAM_INT);
 
