@@ -78,7 +78,7 @@ class Concerto
 
         $statement->execute();
         //$result = $statement->fetchObject('Concerto');
-        //$result = $statement->fetchAll();
+        //$result = $statement->fetchAll($params);
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if($result)
         {
