@@ -47,7 +47,6 @@ class Concerto
         $risultato = $statement->execute();
         if($risultato)
         {
-            $concerto->__Set_Id($connessione->lastInsertId());
             $connessione = null; //chiusura connessione
             return $concerto;
         }
@@ -55,20 +54,50 @@ class Concerto
         return false;
     }
 
-    public function __Delete()
+    public static function Find($concerto)
     {
-        if(!$this->__Validate_Id())
-        {
-            return false;
-        }
-
+        $id = 0;
         $db = new dbConnect("config.txt");
         $connessione = $db->__Connessione();
 
-        $id = $this->__Get_Id();
+        $codice = $concerto->__Get_Codice();
+        $titolo = $concerto->__Get_Titolo();
+        $desc = $concerto->__Get_Descrizione();
+        $data_conc = $concerto->__Get_Data_Concerto();
+        
+        $query = 'select id 
+                  from progetto_concerto.concerti
+                  where codice = :codice, titolo = :titolo, descrizione = :descrizione, data_concerto = :data_concerto';
+        $statement = $connessione->prepare($query);
+        $statement->bindParam(':codice',$codice,PDO::PARAM_STR);
+        $statement->bindParam(':titolo',$titolo,PDO::PARAM_STR);
+        $statement->bindParam(':descrizione',$desc,PDO::PARAM_STR);
+        $statement->bindParam(':data_concerto',$data_conc,PDO::PARAM_STR);
 
-        $query = "delete from progetto_concerto.concerti
-                  where id = :id";
+        $statement->execute();
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        if($result)
+        {
+            return $result['id'];
+        }
+        
+        return false;
+        
+    }
+
+    public function __Delete()
+    {
+        /*if(!$this->__Validate_Id())
+        {
+            return false;
+        }*/
+        
+        $db = new dbConnect("config.txt");
+        $connessione = $db->__Connessione();
+        
+        $id = Concerto::Find($this);
+        
+        $query = "delete from progetto_concerto.concerti where id = :id";
         $statement = $connessione->prepare($query);
         $statement->bindParam(":id",$id,PDO::PARAM_INT);
 
