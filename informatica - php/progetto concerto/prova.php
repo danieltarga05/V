@@ -2,7 +2,9 @@
 require 'concerto.php';
 
 $record = new Concerto('C01','concerto1','descrizione','2023/10/16');
-$risultato = Concerto::Create($record);
-echo "{$risultato}";
+$record = Concerto::Create($record);
+echo "{$record->__Get_Id()}";
+
+$record.__Delete();
 
 ?>
