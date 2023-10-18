@@ -55,5 +55,10 @@ class dbConnect
         }
         return false;
     }*/
+
+    /*public function __Operazioni($query,$concerto)
+    {
+
+    }*/
 }
 ?>
