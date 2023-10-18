@@ -46,10 +46,10 @@ class Concerto
         
         $risultato = $statement->execute();
         if($risultato)
-        {  
-            $ritorno = $connessione->lastInsertId();
+        {
+            $concerto->__Set_Id($connessione->lastInsertId());
             $connessione = null; //chiusura connessione
-            return $ritorno;
+            return $concerto;
         }
         $connessione=null;
         return false;
@@ -57,11 +57,36 @@ class Concerto
 
     public function __Delete()
     {
-        $this->__Set_Id(null);
-        $this->__Set_Codice(null);
-        $this->__Set_Titolo(null);
-        $this->__Set_Descrizione(null);
-        $this->__Set_Data_Concerto(null);
+        if(!$this->__Validate_Id())
+        {
+            return false;
+        }
+
+        $db = new dbConnect("config.txt");
+        $connessione = $db->__Connessione();
+
+        $id = $this->__Get_Id();
+
+        $query = "delete from progetto_concerto.concerti
+                  where id == :id";
+        $statement = $connessione->prepare($query);
+        $statement->bindParam(":id",$id,PDO::PARAM_INT);
+
+        $risultato = $statement->execute();
+        if($risultato)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private function __Validate_Id()
+    {
+        if($this->__Get_Id()==null)
+        {
+            return false;
+        }
+        return true;
     }
 }
 ?>
