@@ -8,12 +8,12 @@ class Concerto
     private $descrizione;
     private $data_concerto;
 
-    public function __construct($codice,$titolo,$desc,$data_concerto)
+    public function __construct($codice,$titolo,$desc)
     {
         $this->__Set_Codice($codice);
         $this->__Set_Titolo($titolo);
         $this->__Set_Descrizione($desc);
-        $this->__Set_Data_Concerto($data_concerto);
+        $this->__Set_Data_Concerto();
     }
     private function __Set_Id($var){$this->id=$var;}
     public function __Get_Id(){return $this->id;}
@@ -23,7 +23,7 @@ class Concerto
     public function __Get_Titolo(){return $this->titolo;}
     public function __Set_Descrizione($var){$this->descrizione=$var;}
     public function __Get_Descrizione(){return $this->descrizione;}
-    public function __Set_Data_Concerto($var){$this->data_concerto=$var;}
+    public function __Set_Data_Concerto(){$this->data_concerto=new DateTime("now");}
     public function __Get_Data_Concerto(){return $this->data_concerto;}
 
     public static function Create($concerto)
@@ -35,6 +35,7 @@ class Concerto
         $titolo = $concerto->__Get_Titolo();
         $desc = $concerto->__Get_Descrizione();
         $data_conc = $concerto->__Get_Data_Concerto();
+        $str_data_conc = $data_conc->format('Y-m-d H:i:s');
         
         $query = 'insert into progetto_concerto.concerti(codice,titolo,descrizione,data_concerto) 
                   values (:codice,:titolo,:descrizione,:data_concerto)';
@@ -42,7 +43,7 @@ class Concerto
         $statement->bindParam(':codice',$codice,PDO::PARAM_STR);
         $statement->bindParam(':titolo',$titolo,PDO::PARAM_STR);
         $statement->bindParam(':descrizione',$desc,PDO::PARAM_STR);
-        $statement->bindParam(':data_concerto',$data_conc,PDO::PARAM_STR);
+        $statement->bindParam(':data_concerto',$str_data_conc,PDO::PARAM_STR);
         
         $risultato = $statement->execute();
         if($risultato)
@@ -64,6 +65,7 @@ class Concerto
         $titolo = $concerto->__Get_Titolo();
         $desc = $concerto->__Get_Descrizione();
         $data_conc = $concerto->__Get_Data_Concerto();
+        $str_data_conc = $data_conc->format('Y-m-d H:i:s');
         
         $query = 'select id 
                   from progetto_concerto.concerti
@@ -72,7 +74,7 @@ class Concerto
         $statement->bindParam(':codice',$codice,PDO::PARAM_STR);
         $statement->bindParam(':titolo',$titolo,PDO::PARAM_STR);
         $statement->bindParam(':descrizione',$desc,PDO::PARAM_STR);
-        $statement->bindParam(':data_concerto',$data_conc,PDO::PARAM_STR);
+        $statement->bindParam(':data_concerto',$str_data_conc,PDO::PARAM_STR);
 
         $statement->execute();
         //$result = $statement->fetchObject('Concerto');
