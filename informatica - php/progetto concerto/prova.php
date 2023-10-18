@@ -2,16 +2,19 @@
 require 'concerto.php';
 
 $record = new Concerto('C01','concerto1','descrizione','2023/10/16');
-$record = Concerto::Create($record);
-echo "{$record->__Get_Id()}";
+$id_creato = Concerto::Create($record);
+echo "{$id_creato}";
 
-if($record->__Delete())
+$trovato = Concerto::Find($record);
+echo "{$trovato}";
+
+/*if($record->__Delete())
 {
     echo "bravo";
 }
 else
 {
     echo "male";
-}
+}*/
 
 ?>

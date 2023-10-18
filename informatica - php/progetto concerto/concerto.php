@@ -47,8 +47,9 @@ class Concerto
         $risultato = $statement->execute();
         if($risultato)
         {
+            $ritorno = $concerto->lastInsertId();
             $connessione = null; //chiusura connessione
-            return $concerto;
+            return $ritorno;
         }
         $connessione=null;
         return false;
@@ -75,6 +76,8 @@ class Concerto
         $statement->bindParam(':data_concerto',$data_conc,PDO::PARAM_STR);
 
         $statement->execute();
+        //$result = $statement->fetchObject('Concerto');
+        //$result = $statement->fetchAll(params);
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if($result)
         {
@@ -82,7 +85,6 @@ class Concerto
         }
         
         return false;
-        
     }
 
     public function __Delete()
