@@ -9,6 +9,9 @@ if($record->__Delete())
 {
     echo "bravo";
 }
-echo "male";
+else
+{
+    echo "male";
+}
 
 ?>
