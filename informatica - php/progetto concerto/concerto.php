@@ -47,7 +47,7 @@ class Concerto
         $risultato = $statement->execute();
         if($risultato)
         {
-            $ritorno = $concerto->lastInsertId();
+            $ritorno = $connessione->lastInsertId();
             $connessione = null; //chiusura connessione
             return $ritorno;
         }
@@ -57,7 +57,6 @@ class Concerto
 
     public static function Find($concerto)
     {
-        $id = 0;
         $db = new dbConnect("config.txt");
         $connessione = $db->__Connessione();
 
@@ -68,7 +67,7 @@ class Concerto
         
         $query = 'select id 
                   from progetto_concerto.concerti
-                  where codice = :codice, titolo = :titolo, descrizione = :descrizione, data_concerto = :data_concerto';
+                  where codice = :codice and titolo = :titolo and descrizione = :descrizione and data_concerto = :data_concerto';
         $statement = $connessione->prepare($query);
         $statement->bindParam(':codice',$codice,PDO::PARAM_STR);
         $statement->bindParam(':titolo',$titolo,PDO::PARAM_STR);
@@ -77,7 +76,7 @@ class Concerto
 
         $statement->execute();
         //$result = $statement->fetchObject('Concerto');
-        //$result = $statement->fetchAll(params);
+        //$result = $statement->fetchAll();
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if($result)
         {
@@ -111,13 +110,13 @@ class Concerto
         return false;
     }
 
-    private function __Validate_Id()
+    /*private function __Validate_Id()
     {
         if($this->__Get_Id()==null)
         {
             return false;
         }
         return true;
-    }
+    }*/
 }
 ?>
