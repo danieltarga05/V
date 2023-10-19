@@ -60,5 +60,11 @@ class dbManager
     {
 
     }*/
+
+    /*public function __Query($query,$stm,$connessione,$params)
+    {
+        $stm=$connessione->prepare($query);
+        $stm->bindParam(':codice')
+    }*/
 }
 ?>
