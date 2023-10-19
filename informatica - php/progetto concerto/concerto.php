@@ -1,5 +1,5 @@
 <?php
-require 'db_management.php';
+require 'db_manager.php';
 class Concerto
 {
     private $id;
@@ -7,7 +7,7 @@ class Concerto
     private $titolo;
     private $descrizione;
     private $data_concerto;
-    public function __construct(int $codice, string $titolo, string $desc)
+    public function __construct($codice, $titolo, $desc)
     {
         $this->__Set_Codice($codice);
         $this->__Set_Titolo($titolo);
@@ -59,14 +59,15 @@ class Concerto
         $titolo = $array['titolo'];
         $desc = $array['descrizione'];
         $data_conc = $array['data_concerto'];
+        $str_data = $data_conc->format("Y-m-d");
 
-        $query = 'insert into progetto_concerto.concerti(codice,titolo,descrizione,data_concerto) 
+        $query = 'insert into organizzazione_concerti.concerti(codice,titolo,descrizione,data_concerto) 
                   values (:codice,:titolo,:descrizione,:data_concerto)';
         $statement = $connessione->prepare($query);
         $statement->bindParam(':codice', $codice, PDO::PARAM_STR);
         $statement->bindParam(':titolo', $titolo, PDO::PARAM_STR);
         $statement->bindParam(':descrizione', $desc, PDO::PARAM_STR);
-        $statement->bindParam(':data_concerto', $data_conc, PDO::PARAM_STR);
+        $statement->bindParam(':data_concerto', $str_data, PDO::PARAM_STR);
 
         $risultato = $statement->execute();
         if ($risultato) {
@@ -85,12 +86,7 @@ class Concerto
         $statement = $connessione->prepare($query);
         $result = $statement->execute();
         if ($result) {
-            $concerti = $statement->fetchAll();
-            $array_concerti = array();
-            for ($i = 0; $i < count($concerti); $i++) {
-                $array_concerti[$i] = new Concerto($concerti['codice'], $concerti['titolo'], $concerti['descrizione']);
-            }
-            return $array_concerti;
+            return $concerti = $statement->fetchAll();
         }
         return array();
     }
