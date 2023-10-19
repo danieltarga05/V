@@ -2,7 +2,7 @@
 
 //require 'concerto.php';
 
-class dbConnect
+class dbManager
 {
     private $host;
     private $dbname;

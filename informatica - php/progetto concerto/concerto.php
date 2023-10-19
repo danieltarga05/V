@@ -7,7 +7,6 @@ class Concerto
     private $titolo;
     private $descrizione;
     private $data_concerto;
-
     public function __construct($codice,$titolo,$desc)
     {
         $this->__Set_Codice($codice);
@@ -15,7 +14,6 @@ class Concerto
         $this->__Set_Descrizione($desc);
         $this->__Set_Data_Concerto();
     }
-    private function __Set_Id($var){$this->id=$var;}
     public function __Get_Id(){return $this->id;}
     public function __Set_Codice($var){$this->codice=$var;}
     public function __Get_Codice(){return $this->codice;}
@@ -25,17 +23,16 @@ class Concerto
     public function __Get_Descrizione(){return $this->descrizione;}
     public function __Set_Data_Concerto(){$this->data_concerto=new DateTime("now");}
     public function __Get_Data_Concerto(){return $this->data_concerto;}
-
-    public static function Create($concerto)
+    public static function Create($array) //cambiare utilizzando un array associativo come parametro
     {
-        $db = new dbConnect("config.txt");
+        $db = new dbManager("config.txt");
         $connessione = $db->__Connessione();
 
-        $codice = $concerto->__Get_Codice();
-        $titolo = $concerto->__Get_Titolo();
-        $desc = $concerto->__Get_Descrizione();
-        $data_conc = $concerto->__Get_Data_Concerto();
-        $str_data_conc = $data_conc->format('Y-m-d H:i:s');
+        $codice = $array['codice'];
+        $titolo = $array['titolo'];
+        $desc = $array['descrizione'];
+        $data_conc = $array['data_concerto'];;
+        //$str_data_conc = $data_conc->format('Y-m-d H:i:s');
         
         $query = 'insert into progetto_concerto.concerti(codice,titolo,descrizione,data_concerto) 
                   values (:codice,:titolo,:descrizione,:data_concerto)';
@@ -44,7 +41,6 @@ class Concerto
         $statement->bindParam(':titolo',$titolo,PDO::PARAM_STR);
         $statement->bindParam(':descrizione',$desc,PDO::PARAM_STR);
         $statement->bindParam(':data_concerto',$str_data_conc,PDO::PARAM_STR);
-        
         $risultato = $statement->execute();
         if($risultato)
         {
@@ -55,17 +51,15 @@ class Concerto
         $connessione=null;
         return false;
     }
-
-    public static function Find($concerto)
+    /*public static function Find($concerto)
     {
-        $db = new dbConnect("config.txt");
+        $db = new dbManager("config.txt");
         $connessione = $db->__Connessione();
 
         $codice = $concerto->__Get_Codice();
         $titolo = $concerto->__Get_Titolo();
         $desc = $concerto->__Get_Descrizione();
-        $data_conc = $concerto->__Get_Data_Concerto();
-        $str_data_conc = $data_conc->format('Y-m-d H:i:s');
+        $str_data_conc = $concerto->__Get_Data_Concerto()->format('Y-m-d H:i:s');
         
         $query = 'select id 
                   from progetto_concerto.concerti
@@ -75,35 +69,23 @@ class Concerto
         $statement->bindParam(':titolo',$titolo,PDO::PARAM_STR);
         $statement->bindParam(':descrizione',$desc,PDO::PARAM_STR);
         $statement->bindParam(':data_concerto',$str_data_conc,PDO::PARAM_STR);
-
         $statement->execute();
-        //$result = $statement->fetchObject('Concerto');
-        //$result = $statement->fetchAll($params);
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        $result = $statement->fetch(PDO::FETCH_ASSOC); //fetching del risultato dell'execute
         if($result)
         {
             return $result['id'];
         }
         
         return false;
-    }
-
+    }*/
     public function __Delete()
     {
-        /*if(!$this->__Validate_Id())
-        {
-            return false;
-        }*/
-        
-        $db = new dbConnect("config.txt");
+        $db = new dbManager("config.txt");
         $connessione = $db->__Connessione();
-        
         $id = Concerto::Find($this);
-        
         $query = "delete from progetto_concerto.concerti where id = :id";
         $statement = $connessione->prepare($query);
         $statement->bindParam(":id",$id,PDO::PARAM_INT);
-
         $risultato = $statement->execute();
         if($risultato)
         {
@@ -111,14 +93,5 @@ class Concerto
         }
         return false;
     }
-
-    /*private function __Validate_Id()
-    {
-        if($this->__Get_Id()==null)
-        {
-            return false;
-        }
-        return true;
-    }*/
 }
 ?>
