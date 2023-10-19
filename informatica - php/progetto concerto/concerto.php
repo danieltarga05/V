@@ -1,5 +1,5 @@
 <?php
-require 'connessione.php';
+require 'db_management.php';
 class Concerto
 {
     private $id;
@@ -59,7 +59,6 @@ class Concerto
         $titolo = $array['titolo'];
         $desc = $array['descrizione'];
         $data_conc = $array['data_concerto'];
-        ;
 
         $query = 'insert into progetto_concerto.concerti(codice,titolo,descrizione,data_concerto) 
                   values (:codice,:titolo,:descrizione,:data_concerto)';
