@@ -14,6 +14,10 @@ class Concerto
         $this->__Set_Descrizione($desc);
         $this->__Set_Data_Concerto();
     }
+    private function __Set_Id($var)
+    {
+        $this->id = $var;
+    }
     public function __Get_Id()
     {
         return $this->id;
@@ -83,18 +87,21 @@ class Concerto
         $db = new dbManager('config.txt');
         $connessione = $db->__Connessione();
         $query = "select * from organizzazione_concerti.concerti";
-        $statement = $connessione->prepare($query);
-        $result = $statement->execute();
-        if ($result) {
-            return $concerti = $statement->fetchAll();
+        $statement = $connessione->query($query);
+        $concerti = [];
+        $i = 0;
+        while($obj = $statement->fetchObject("Concerto")) 
+        {
+            $concerti[$i++] = $obj;
         }
-        return array();
+        return $concerti;
     }
     public function __Delete()
     {
         $db = new dbManager("config.txt");
         $connessione = $db->__Connessione();
-        $id = Concerto::Find($this);
+        $concerto = Concerto::Find($this);
+        $id = $concerto->__GetId();
         $query = "delete from progetto_concerto.concerti where id = :id";
         $statement = $connessione->prepare($query);
         $statement->bindParam(":id", $id, PDO::PARAM_INT);
