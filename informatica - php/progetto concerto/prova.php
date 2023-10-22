@@ -12,25 +12,15 @@ $array = [
 $id_creato = Concerto::Create($array);
 echo "{$id_creato}\n";*/
 
-$concerti = Concerto::FindAll();
+/*$concerti = Concerto::FindAll();
 foreach ($concerti as $a) {
     echo $a->__Get_Codice() . ' ' . $a->__Get_Titolo() . ' ' . $a->__Get_Data_Concerto()->format('Y m d') . PHP_EOL;
-}
+}*/
 
-/*$concerti = Concerto::FindAll();
-foreach($concerto as $concerti)
-{
-    echo "ID: " . $utente['id'] . "<br>";
-    echo "Codice: " . $utente['codice'] . "<br>";
-    echo "Titolo: " . $utente['titolo'] . "<br>";
-    echo "Descrizione" . $utente['descrizione'] . "<br>";
-    echo "Data" . $utente['data_concerto'] . "<br>";
-}
+$trovato = Concerto::Find(5);
+echo "{$trovato->__Get_Titolo()}\n";
 
-/*$trovato = Concerto::Find($record);
-echo "{$trovato}\n";
-
-if ($record->__Delete()) {
+/*if ($record->__Delete()) {
     echo "bravo";
 } else {
     echo "male";

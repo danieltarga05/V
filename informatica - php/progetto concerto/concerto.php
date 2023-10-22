@@ -65,8 +65,7 @@ class Concerto
         $data_conc = $array['data_concerto'];
         $str_data = $data_conc->format("Y-m-d H:i:s");
 
-        $query = 'insert into organizzazione_concerti.concerti(codice,titolo,descrizione,data_concerto) 
-                  values (:codice,:titolo,:descrizione,:data_concerto)';
+        $query = 'insert into organizzazione_concerti.concerti(codice,titolo,descrizione,data_concerto) values (:codice,:titolo,:descrizione,:data_concerto)';
         $statement = $connessione->prepare($query);
         $statement->bindParam(':codice', $codice, PDO::PARAM_STR);
         $statement->bindParam(':titolo', $titolo, PDO::PARAM_STR);
@@ -90,47 +89,43 @@ class Concerto
         $connessione = $db->__Connessione();
         $query = "select * from organizzazione_concerti.concerti";
         $statement = $connessione->query($query);
-        while ($obj = $statement->fetch()) 
-        {
-            $concerti[$i++] = new Concerto($obj['codice'],$obj['titolo'],$obj['descrizione'],$obj['data_concerto']);
+        while ($obj = $statement->fetch()) {
+            $concerti[$i++] = new Concerto($obj['codice'], $obj['titolo'], $obj['descrizione'], $obj['data_concerto']);
         }
         $connessione = null;
         return $concerti;
     }
-
-        public static function Find($id)
+    public static function Find(int $id) //Tramite un id viene ritornato il corrispondente record
     {
         $db = new dbManager("config.txt");
         $connessione = $db->__Connessione();
-        $query = "find from progetto_concerto.concerti where id = :id";
-        $statement = $connessione->prepare($query);
-        $statement->fetch("id",$id,PDO::PARAM_INT);
-        $risultato = $statement->execute();
-        if ($risultato)
-        {
-            $concerto =$statement->fetch("id",$id,PDO::FETCH_ASSOC);  
-            return $concerto; 
-        }
-        else
-        {
-            return null;
-        }
-        
-    }
-    
-    public function __Delete()
-    {
-        $db = new dbManager("config.txt");
-        $connessione = $db->__Connessione();
-        $concerto = Concerto::Find($this);
-        $id = $concerto->__GetId();
-        $query = "delete from progetto_concerto.concerti where id = :id";
+        $query = "select * from organizzazione_concerti.concerti where id = :id";
         $statement = $connessione->prepare($query);
         $statement->bindParam(":id", $id, PDO::PARAM_INT);
         $risultato = $statement->execute();
         if ($risultato) {
+            $fetch = $statement->fetch();
+            $concerto = new Concerto($fetch['codice'],$fetch['titolo'],$fetch['descrizione'],$fetch['data_concerto']);
+            $connessione=null;
+            return $concerto;
+        }
+        $connessione=null;
+        return null;
+    }
+    public function __Delete()
+    {
+        $db = new dbManager("config.txt");
+        $connessione = $db->__Connessione();
+        $concerto = Concerto::Find($this->__Get_Id());
+        $id = $concerto->__GetId();
+        $query = "delete from progetto_concerto.concerti where id = :id";
+        $risultato = $connessione->query($query);
+        $risultato->bindParam(":id", $id, PDO::PARAM_INT);
+        if ($risultato) {
+            $connessione=null;
             return true;
         }
+        $connessione=null;
         return false;
     }
 }
