@@ -8,8 +8,3 @@ create table organizzazione_concerti.concerti
 	descrizione varchar(100),
 	data_concerto datetime
 );
-
-/*delete from progetto_concerto.concerti
-where id = 5 ;*/
-
--- delete from progetto_concerto.concerti ;
