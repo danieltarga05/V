@@ -20,7 +20,7 @@ class Concerto
     }
     public function __Get_Id()
     {
-        return $this->id;
+        return $this->__Validate_Id($this);
     }
     public function __Set_Codice($var)
     {
@@ -116,14 +116,43 @@ class Concerto
     {
         $db = new dbManager("config.txt");
         $connessione = $db->__Connessione();
-        $concerto = Concerto::Find($this->__Get_Id());
-        $id = $concerto->__GetId();
+        $concerto = Concerto::Find(Concerto::__Validate_Id($this));
+        $id = $concerto->__Get_Id();
         $query = "delete from progetto_concerto.concerti where id = :id";
         $risultato = $connessione->query($query);
         $risultato->bindParam(":id", $id, PDO::PARAM_INT);
         if ($risultato) {
             $connessione=null;
             return true;
+        }
+        $connessione=null;
+        return false;
+    }
+
+    private static function __Validate_Id(Concerto $concerto)
+    {
+        $db = new dbManager("config.txt");
+        $connessione = $db->__Connessione();
+
+        $codice = $concerto->__Get_Codice();
+        $titolo = $concerto->__Get_Titolo();
+        $desc = $concerto->__Get_Descrizione();
+        $data_conc = $concerto->__Get_Data_Concerto();
+
+        $query = 'select id from progetto_concerto.concerti 
+                  where codice = :codice, titolo = :titolo, descrizione = :descrizione, data_concerto = :data_concerto';
+        $statement = $connessione->prepare($query);
+        $statement->bindParam(':codice',$codice,PDO::PARAM_STR);
+        $statement->bindParam(':titolo',$titolo,PDO::PARAM_STR);
+        $statement->bindParam(':descrizione',$desc,PDO::PARAM_STR);
+        $statement->bindParam(':data_concerto',$data_conc,PDO::PARAM_STR);
+
+        $statement->execute();
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        if($result)
+        {
+            $connessione =null;
+            return $result['id'];
         }
         $connessione=null;
         return false;

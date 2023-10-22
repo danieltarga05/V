@@ -17,8 +17,8 @@ foreach ($concerti as $a) {
     echo $a->__Get_Codice() . ' ' . $a->__Get_Titolo() . ' ' . $a->__Get_Data_Concerto()->format('Y m d') . PHP_EOL;
 }*/
 
-$trovato = Concerto::Find(5);
-echo "{$trovato->__Get_Titolo()}\n";
+/*$trovato = Concerto::Find(5);
+echo "{$trovato->__Get_Titolo()}\n";*/
 
 /*if ($record->__Delete()) {
     echo "bravo";
