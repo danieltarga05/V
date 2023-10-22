@@ -7,12 +7,12 @@ class Concerto
     private $titolo;
     private $descrizione;
     private $data_concerto;
-    public function __construct($codice, $titolo, $desc)
+    public function __construct($codice, $titolo, $descrizione, $data_concerto)
     {
         $this->__Set_Codice($codice);
         $this->__Set_Titolo($titolo);
-        $this->__Set_Descrizione($desc);
-        $this->__Set_Data_Concerto();
+        $this->__Set_Descrizione($descrizione);
+        $this->__Set_Data_Concerto($data_concerto);
     }
     private function __Set_Id($var)
     {
@@ -46,9 +46,9 @@ class Concerto
     {
         return $this->descrizione;
     }
-    public function __Set_Data_Concerto()
+    public function __Set_Data_Concerto($var)
     {
-        $this->data_concerto = new DateTime("now");
+        $this->data_concerto = new DateTime($var);
     }
     public function __Get_Data_Concerto()
     {
@@ -56,14 +56,14 @@ class Concerto
     }
     public static function Create($array) //cambiare utilizzando un array associativo come parametro
     {
-        $db = new dbManager("config.txt");
+        $db = new dbManager('config.txt');
         $connessione = $db->__Connessione();
 
         $codice = $array['codice'];
         $titolo = $array['titolo'];
         $desc = $array['descrizione'];
         $data_conc = $array['data_concerto'];
-        $str_data = $data_conc->format("Y-m-d");
+        $str_data = $data_conc->format("Y-m-d H:i:s");
 
         $query = 'insert into organizzazione_concerti.concerti(codice,titolo,descrizione,data_concerto) 
                   values (:codice,:titolo,:descrizione,:data_concerto)';
@@ -85,15 +85,16 @@ class Concerto
     public static function FindAll()
     {
         $db = new dbManager('config.txt');
+        $concerti = [];
+        $i = 0;
         $connessione = $db->__Connessione();
         $query = "select * from organizzazione_concerti.concerti";
         $statement = $connessione->query($query);
-        $concerti = [];
-        $i = 0;
-        while($obj = $statement->fetchObject("Concerto")) 
+        while ($obj = $statement->fetch()) 
         {
-            $concerti[$i++] = $obj;
+            $concerti[$i++] = new Concerto($obj['codice'],$obj['titolo'],$obj['descrizione'],$obj['data_concerto']);
         }
+        $connessione = null;
         return $concerti;
     }
     public function __Delete()
