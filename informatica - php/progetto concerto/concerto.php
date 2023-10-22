@@ -97,6 +97,27 @@ class Concerto
         $connessione = null;
         return $concerti;
     }
+
+        public static function Find($id)
+    {
+        $db = new dbManager("config.txt");
+        $connessione = $db->__Connessione();
+        $query = "find from progetto_concerto.concerti where id = :id";
+        $statement = $connessione->prepare($query);
+        $statement->fetch("id",$id,PDO::PARAM_INT);
+        $risultato = $statement->execute();
+        if ($risultato)
+        {
+            $concerto =$statement->fetch("id",$id,PDO::FETCH_ASSOC);  
+            return $concerto; 
+        }
+        else
+        {
+            return null;
+        }
+        
+    }
+    
     public function __Delete()
     {
         $db = new dbManager("config.txt");
