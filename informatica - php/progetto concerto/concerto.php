@@ -81,20 +81,6 @@ class Concerto
         $connessione = null;
         return false;
     }
-    public static function FindAll()
-    {
-        $db = new dbManager('config.txt');
-        $concerti = [];
-        $i = 0;
-        $connessione = $db->__Connessione();
-        $query = "select * from organizzazione_concerti.concerti";
-        $statement = $connessione->query($query);
-        while ($obj = $statement->fetch()) {
-            $concerti[$i++] = new Concerto($obj['codice'], $obj['titolo'], $obj['descrizione'], $obj['data_concerto']);
-        }
-        $connessione = null;
-        return $concerti;
-    }
     public static function Find(int $id) //Tramite un id viene ritornato il corrispondente record
     {
         $db = new dbManager("config.txt");
@@ -112,6 +98,20 @@ class Concerto
         $connessione=null;
         return null;
     }
+    public static function FindAll()
+    {
+        $db = new dbManager('config.txt');
+        $concerti = [];
+        $i = 0;
+        $connessione = $db->__Connessione();
+        $query = "select * from organizzazione_concerti.concerti";
+        $statement = $connessione->query($query);
+        while ($obj = $statement->fetch()) {
+            $concerti[$i++] = new Concerto($obj['codice'], $obj['titolo'], $obj['descrizione'], $obj['data_concerto']);
+        }
+        $connessione = null;
+        return $concerti;
+    }
     public function __Delete()
     {
         $db = new dbManager("config.txt");
@@ -128,7 +128,6 @@ class Concerto
         $connessione=null;
         return false;
     }
-
     private static function Validate_Id(Concerto $concerto)
     {
         $db = new dbManager("config.txt");
@@ -139,8 +138,7 @@ class Concerto
         $desc = $concerto->__Get_Descrizione();
         $data_conc = $concerto->__Get_Data_Concerto();
 
-        $query = 'select id from progetto_concerto.concerti 
-                  where codice = :codice, titolo = :titolo, descrizione = :descrizione, data_concerto = :data_concerto';
+        $query = 'select id from progetto_concerto.concerti where codice = :codice, titolo = :titolo, descrizione = :descrizione, data_concerto = :data_concerto';
         $statement = $connessione->prepare($query);
         $statement->bindParam(':codice',$codice,PDO::PARAM_STR);
         $statement->bindParam(':titolo',$titolo,PDO::PARAM_STR);
@@ -156,6 +154,27 @@ class Concerto
         }
         $connessione=null;
         return false;
+    }
+}
+
+while(1)
+{
+    echo "1 - Crea record";
+    echo "2 - Modifica record";
+    echo "3 - Mostra record";
+    echo "4 - Mostra concerti";
+    echo "5 - Cancella record";
+    echo "0 - Chiudi";
+
+    $option = readline();
+    switch($option)
+    {
+        case 0:exit("Chiusura programma...");
+        case 1:;break;
+        case 2:;break;
+        case 3:;break;
+        case 4:;break;
+        case 5:;break;
     }
 }
 ?>
