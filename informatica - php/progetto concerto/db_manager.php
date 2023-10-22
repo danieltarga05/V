@@ -26,21 +26,20 @@ class dbManager
             die("connesione fallita : ".$e->getMessage());
         }   
     }
-    public function __Insert_Into(array $params = [])
+    public function __Insert_Into(array $params)
     {
         $this->__Connessione();
-        $codice = $params['codice'];
         $titolo = $params['titolo'];
         $desc = $params['descrizione'];
-        $str_data = $params['data_concerto']->format("Y-m-d");
+        $str_data = DateTime::createFromFormat('Y-m-d', $params['data_concerto']);
 
         $this->__Prepare('insert into organizzazione_concerti.concerti(codice,titolo,descrizione,data_concerto) values (:codice,:titolo,:descrizione,:data_concerto)');
-        $this->stmt->bindParam(':codice', $codice, PDO::PARAM_STR);
+        $this->stmt->bindParam(':codice', $params['codice'],PDO::PARAM_STR);
         $this->stmt->bindParam(':titolo', $titolo, PDO::PARAM_STR);
         $this->stmt->bindParam(':descrizione', $desc, PDO::PARAM_STR);
         $this->stmt->bindParam(':data_concerto', $str_data, PDO::PARAM_STR);
 
-        return $this->__Execute();
+        return $this->stmt->execute();
     }
     public function __Last_Insert_Id()
     {
@@ -77,7 +76,7 @@ class dbManager
 
         return $this->__Execute();
     }
-    public function __Find_Id(array $params = [])
+    public function __Find_Id(array $params)
     {
         $this->__Connessione();
         $this->__Prepare('select id from progetto_concerto.concerti where codice = :codice, titolo = :titolo, descrizione = :descrizione, data_concerto = :data_concerto');
@@ -96,11 +95,11 @@ class dbManager
     {
         return $this->stmt->fetch(PDO::FETCH_ASSOC);
     }
-    public function __Update(array $to_update = [], array $updated = [])
+    public function __Update(array $to_update, array $updated)
     {
         $query = 'update from organizzazione_concerti.concerti set codice = :codice and titolo = :titolo and descrizione = :descrizione and data_concerto = :data_concerto
         where codice = :codice2 and titolo = :titolo2 and descrizione = :descrizione2 and data_concerto = :data_concerto2';
-        $this->__Prepare($query);
+        $this->stmt = $this->__Prepare($query);
         $this->stmt->bindParam(':codice', $updated['codice'], PDO::PARAM_STR);
         $this->stmt->bindParam(':titolo', $updated['titolo'], PDO::PARAM_STR);
         $this->stmt->bindParam(':descrizione', $updated['descrizione'], PDO::PARAM_STR);
@@ -113,9 +112,9 @@ class dbManager
         
         return $this->__Execute();
     }
-    public function __Prepare(string $query)
+    public function __Prepare($query)
     {
-        $this->connessione->prepare($query);
+        $this->stmt = $this->connessione->prepare($query);
     }
     public function __Execute()
     {

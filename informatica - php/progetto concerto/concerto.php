@@ -60,8 +60,9 @@ class Concerto
         $db->__Connessione();
 
         if ($result = $db->__Insert_Into($params)) {
+            $id = $db->__Last_Insert_Id();
             $db->__Close(); //chiusura connessione
-            return $id = $db->__Last_Insert_Id();
+            return $id;
         }
         $db->__Close();
         return false;
@@ -201,19 +202,17 @@ function create()
             break;
         }
     }
-
     $params = [
         'codice' => $codice,
         'titolo' => $titolo,
         'descrizione' => $descrizione,
         'data_concerto' => $dateTimeObj
     ];
-
     if (Concerto::Create($params)) {
-        echo "Record creato.";
+        echo "Record creato." . PHP_EOL;
         return;
     }
-    echo "Record non creato";
+    echo "Record non creato" . PHP_EOL;
 }
 function update()
 {
