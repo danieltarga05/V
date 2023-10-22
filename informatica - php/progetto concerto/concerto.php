@@ -20,7 +20,7 @@ class Concerto
     }
     public function __Get_Id()
     {
-        return $this->__Validate_Id($this);
+        return self::Validate_Id($this);
     }
     public function __Set_Codice($var)
     {
@@ -116,7 +116,7 @@ class Concerto
     {
         $db = new dbManager("config.txt");
         $connessione = $db->__Connessione();
-        $concerto = Concerto::Find(Concerto::__Validate_Id($this));
+        $concerto = Concerto::Find(Concerto::Validate_Id($this));
         $id = $concerto->__Get_Id();
         $query = "delete from progetto_concerto.concerti where id = :id";
         $risultato = $connessione->query($query);
@@ -129,7 +129,7 @@ class Concerto
         return false;
     }
 
-    private static function __Validate_Id(Concerto $concerto)
+    private static function Validate_Id(Concerto $concerto)
     {
         $db = new dbManager("config.txt");
         $connessione = $db->__Connessione();
