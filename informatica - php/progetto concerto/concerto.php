@@ -63,7 +63,7 @@ class Concerto
         $db = new dbManager('config.txt');
         $db->__Connessione();
 
-        if ($result = $db->__Insert_Into($params)) {
+        if ($db->__Insert_Into($params)) {
             $id = $db->__Last_Insert_Id();
             $db->__Close(); //chiusura connessione
             return $id;
@@ -79,7 +79,7 @@ class Concerto
         if ($db->__Find($id)) {
             $fetch = $db->__Fetch_Next();
             $db->__Close();
-            $new = new Concerto($fetch[0], $fetch[1], $fetch[2], $fetch[3]);
+            $new = new Concerto(@$fetch['codice'], @$fetch['titolo'], @$fetch['descrizione'], @$fetch['data_concerto']);
             return $new;
         }
         $db->__Close();
@@ -120,7 +120,6 @@ class Concerto
             'descrizione' => $concerto->__Get_Descrizione(),
             'data_concerto' => $concerto->__Get_Data_Concerto()
         ];
-        echo $params['data_concerto'];
         if ($id = $db->__Select_Id($params)) {
             $db->__Close();
             return $id;
@@ -131,7 +130,6 @@ class Concerto
     public function __Update(array $params)
     {
         $new = $this->__Set_New($params);
-        echo $new->__Get_Codice() . ' ' . $new->__Get_Titolo() .''. $new->__Get_Descrizione();
         $db = new dbManager("config.txt");
         $db->__Connessione();
 
@@ -141,6 +139,7 @@ class Concerto
             'descrizione' => $this->__Get_Descrizione(),
             'data_concerto' => $this->__Get_Data_Concerto()
         ];
+        
         $updated = [
             'codice' => $new->__Get_Codice(),
             'titolo' => $new->__Get_Titolo(),
@@ -319,7 +318,7 @@ while (1) {
             create(); //funziona
             break;
         case 2:
-            update(); //?
+            update(); //funziona ma problemi riga 83
             break;
         case 3:
             find(); //funziona
