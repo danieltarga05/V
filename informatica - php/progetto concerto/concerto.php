@@ -48,7 +48,11 @@ class Concerto
     }
     public function __Set_Data_Concerto($var)
     {
-        $this->data_concerto = new DateTime($var);
+        $dateTimeObj = $var;
+        if ($dateTimeObj == null) {
+            $dateTimeObj = new DateTime();
+        }
+        $this->data_concerto = $dateTimeObj;
     }
     public function __Get_Data_Concerto()
     {
@@ -71,11 +75,12 @@ class Concerto
     {
         $db = new dbManager("config.txt");
         $db->__Connessione();
-        
-        if ($risultato = $db->__Find($id)) {
+
+        if ($db->__Find($id)) {
             $fetch = $db->__Fetch_Next();
             $db->__Close();
-            return $concerto = new Concerto($fetch['codice'], $fetch['titolo'], $fetch['descrizione'], $fetch['data_concerto']);
+            $new = new Concerto($fetch[0], $fetch[1], $fetch[2], $fetch[3]);
+            return $new;
         }
         $db->__Close();
         return false;
@@ -84,7 +89,7 @@ class Concerto
     {
         $db = new dbManager('config.txt');
         $db->__Connessione();
-        if($concerti = $db->__Find_All()) {
+        if ($concerti = $db->__Find_All()) {
             $db->__Close();
             return $concerti;
         }
@@ -95,9 +100,9 @@ class Concerto
     {
         $db = new dbManager("config.txt");
         $db->__Connessione();
-        $concerto = Concerto::Find(Concerto::Validate_Id($this));
+        $concerto = Concerto::Find($this->__Get_Id());
         $id = $concerto->__Get_Id();
-        
+
         if ($result = $db->__Delete($id)) {
             $db->__Close();
             return $result;
@@ -110,40 +115,40 @@ class Concerto
         $db = new dbManager("config.txt");
         $db->__Connessione();
         $params = [
-            'codice'=> $concerto->__Get_Codice(),
-            'titolo'=> $concerto->__Get_Titolo(),
-            'descrizione'=> $concerto->__Get_Descrizione(),
-            'data_concerto'=> $concerto->__Get_Data_Concerto()
+            'codice' => $concerto->__Get_Codice(),
+            'titolo' => $concerto->__Get_Titolo(),
+            'descrizione' => $concerto->__Get_Descrizione(),
+            'data_concerto' => $concerto->__Get_Data_Concerto()
         ];
-        if($id = $db->__Find_Id($params))
-        {
+        echo $params['data_concerto'];
+        if ($id = $db->__Select_Id($params)) {
             $db->__Close();
             return $id;
         }
         $db->__Close();
         return false;
     }
-    public function __Update(array $params = [])
+    public function __Update(array $params)
     {
-        $new = $this->__Set_New();
-
+        $new = $this->__Set_New($params);
+        echo $new->__Get_Codice() . ' ' . $new->__Get_Titolo() .''. $new->__Get_Descrizione();
         $db = new dbManager("config.txt");
         $db->__Connessione();
-       
+
         $to_update = [
-            'codice'=> $this->__Get_Codice(),
-            'titolo'=> $this->__Get_Titolo(),
-            'descrizione'=> $this->__Get_Descrizione(),
-            'data_concerto'=> $this->__Get_Data_Concerto()
+            'codice' => $this->__Get_Codice(),
+            'titolo' => $this->__Get_Titolo(),
+            'descrizione' => $this->__Get_Descrizione(),
+            'data_concerto' => $this->__Get_Data_Concerto()
         ];
         $updated = [
-            'codice'=> $new->__Get_Codice(),
-            'titolo'=> $new->__Get_Titolo(),
-            'descrizione'=> $new->__Get_Descrizione(),
-            'data_concerto'=> $new->__Get_Data_Concerto()
+            'codice' => $new->__Get_Codice(),
+            'titolo' => $new->__Get_Titolo(),
+            'descrizione' => $new->__Get_Descrizione(),
+            'data_concerto' => $new->__Get_Data_Concerto()
         ];
-        
-        if ($result=$db->__Update($to_update,$updated)) {
+
+        if ($db->__Update($to_update, $updated)) {
             $this->__Set_Codice($updated['codice']);
             $this->__Set_Titolo($updated['titolo']);
             $this->__Set_Descrizione($updated['descrizione']);
@@ -154,19 +159,19 @@ class Concerto
         $db->__Close();
         return false;
     }
-    private function __Set_New(array $params = [])
+    private function __Set_New(array $params)
     {
         $updated = Concerto::Find($this->__Get_Id());
-        if (empty($params['codice'])) {
+        if (!empty($params['codice'])) {
             $updated->__Set_Codice($params['codice']);
         }
-        if (empty($params['titolo'])) {
+        if (!empty($params['titolo'])) {
             $updated->__Set_Titolo($params['titolo']);
         }
-        if (empty($params['descrizione'])) {
+        if (!empty($params['descrizione'])) {
             $updated->__Set_Descrizione($params['descrizione']);
         }
-        if (empty($params['data_concerto'])) {
+        if (!empty($params['data_concerto'])) {
             $updated->__Set_Data_Concerto($params['data_concerto']);
         }
         return $updated;
@@ -174,32 +179,30 @@ class Concerto
     public function __Show()
     {
         $show = Concerto::Find($this->__Get_Id());
-        return "ID : {$show->__Get_Id()} - CODICE : {$show->__Get_Codice()} - TITOLO : {$this->__Get_Descrizione()} - DESCRIZIONE : {$this->__Get_Descrizione()} - DATA CONCERTO : {$this->__Get_Data_Concerto()->format("Y m d")}";
+
+        return "ID : " . $show->__Get_Id() . " - CODICE : " . $show->__Get_Codice() . "- TITOLO : " . $show->__Get_Descrizione() . " - DESCRIZIONE : " . $show->__Get_Descrizione() . " - DATA CONCERTO : {$show->__Get_Data_Concerto()->format("Y m d")}";
     }
 }
 function create()
 {
     echo "Inserisci codice  : ";
-    while(empty($codice))
-    {
+    while (empty($codice)) {
         $codice = readline();
     }
     echo "Inserisci titolo : ";
-    while(empty($titolo)){
+    while (empty($titolo)) {
         $titolo = readline();
     }
     echo "Inserisci descrizione : ";
-    while(empty($descrizione))
-    {
+    while (empty($descrizione)) {
         $descrizione = readline();
     }
     echo "Inserisci data : ";
-    while(empty($data))
-    {
+    while (empty($data)) {
         $data = readline();
-        $dateTimeObj = DateTime::createFromFormat("Y m d", $data);
-        if($dateTimeObj !== null){
-            break;
+        $dateTimeObj = DateTime::createFromFormat("Y-m-d", $data);
+        if ($dateTimeObj == null) {
+            $dateTimeObj = new DateTime();
         }
     }
     $params = [
@@ -219,31 +222,56 @@ function update()
     echo "inserisci id del record da modificare : ";
     $id = readline();
     if ($concerto = Concerto::Find($id)) {
+        echo "Inserisci nuovo codice  : ";
+        $codice = readline();
+        if(empty($codice))
+        {
+            $codice = $concerto->__Get_Codice();
+        }
+        echo "Inserisci titolo : ";
+        $titolo = readline();
+        if(empty($titolo))
+        {
+            $titolo = $concerto->__Get_Titolo();
+        }
+        echo "Inserisci descrizione : ";
+        $descrizione = readline();
+        if(empty($descrizione))
+        {
+            $descrizione = $concerto->__Get_Descrizione();
+        }
+        echo "Inserisci data : ";
+        $data = readline();
+        $dateTimeObj = DateTime::createFromFormat("Y-m-d", $data);
+        if($dateTimeObj == null)
+        {
+            $dateTimeObj = $concerto->__Get_Data_Concerto(); 
+        }
         $params = [
-            'codice' => readline(),
-            'titolo' => readline(),
-            'descrizione' => readline(),
-            'data_concerto' => strtotime(readline())
+            'codice' => $codice,
+            'titolo' => $titolo,
+            'descrizione' => $descrizione,
+            'data_concerto' => $dateTimeObj
         ];
 
-        if ($result = $concerto->__Update($params)) {
-            echo 'Record modificato';
+        if ($concerto->__Update($params)) {
+            echo 'Record modificato' . PHP_EOL;
             return;
         }
-        echo 'Record non modificabile';
+        echo 'Record non modificabile' . PHP_EOL;
         return;
     }
-    echo 'ID non esistente';
+    echo 'ID non esistente' . PHP_EOL;
 }
 function find()
 {
     echo "inserisci id : ";
     $id = readline();
-    if ($concerto = Concerto::Find($id)) {
-        echo "ID presente in concerti";
+    if (Concerto::Find($id)) {
+        echo "ID presente in concerti" . PHP_EOL;
         return;
     }
-    echo "ID non esistente";
+    echo "ID non esistente" . PHP_EOL;
 }
 function find_all()
 {
@@ -258,10 +286,10 @@ function delete()
     $id = readline();
     if ($concerto = Concerto::Find($id)) {
         $concerto->__Delete();
-        echo 'Record eliminato.';
+        echo 'Record eliminato.' . PHP_EOL;
         return;
     }
-    echo "ID non esistente";
+    echo "ID non esistente" . PHP_EOL;
 }
 function show()
 {
@@ -271,7 +299,7 @@ function show()
         echo $concerto->__Show();
         return;
     }
-    echo "ID non esistente";
+    echo "ID non esistente." . PHP_EOL;
 }
 
 while (1) {
@@ -288,16 +316,16 @@ while (1) {
         case 0:
             exit("Chiusura programma...");
         case 1:
-            create();
+            create(); //funziona
             break;
         case 2:
-            update();
+            update(); //?
             break;
         case 3:
-            find();
+            find(); //funziona
             break;
         case 4:
-            find_all();
+            find_all(); //?
             break;
         case 5:
             delete();

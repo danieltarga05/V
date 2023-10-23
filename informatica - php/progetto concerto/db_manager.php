@@ -29,14 +29,11 @@ class dbManager
     public function __Insert_Into(array $params)
     {
         $this->__Connessione();
-        $titolo = $params['titolo'];
-        $desc = $params['descrizione'];
-        $str_data = DateTime::createFromFormat('Y-m-d', $params['data_concerto']);
-
+        $str_data = $params['data_concerto']->format("Y-m-d");
         $this->__Prepare('insert into organizzazione_concerti.concerti(codice,titolo,descrizione,data_concerto) values (:codice,:titolo,:descrizione,:data_concerto)');
         $this->stmt->bindParam(':codice', $params['codice'],PDO::PARAM_STR);
-        $this->stmt->bindParam(':titolo', $titolo, PDO::PARAM_STR);
-        $this->stmt->bindParam(':descrizione', $desc, PDO::PARAM_STR);
+        $this->stmt->bindParam(':titolo', $params['titolo'], PDO::PARAM_STR);
+        $this->stmt->bindParam(':descrizione', $params['descrizione'], PDO::PARAM_STR);
         $this->stmt->bindParam(':data_concerto', $str_data, PDO::PARAM_STR);
 
         return $this->stmt->execute();
@@ -55,7 +52,7 @@ class dbManager
     }
     public function __Fetch_Next()
     {
-        return $this->stmt->fetch();
+        return $this->stmt->fetch(PDO::FETCH_NUM);
     }
     public function __Find_All()
     {
@@ -64,7 +61,7 @@ class dbManager
         $this->__Connessione();
         $this->__Prepare('select * from organizzazione_concerti.concerti');
         while ($obj = $this->__Fetch_Next()) {
-            $concerti[$i++] = new Concerto($obj['codice'], $obj['titolo'], $obj['descrizione'], $obj['data_concerto']);
+            $concerti[$i++] = new Concerto($obj[0], $obj[1], $obj[2], $obj[3]);
         }
         return $concerti;
     }
@@ -76,14 +73,16 @@ class dbManager
 
         return $this->__Execute();
     }
-    public function __Find_Id(array $params)
+    public function __Select_Id(array $params)
     {
         $this->__Connessione();
-        $this->__Prepare('select id from progetto_concerto.concerti where codice = :codice, titolo = :titolo, descrizione = :descrizione, data_concerto = :data_concerto');
+        $str_data = $params['data_concerto'];
+
+        $this->__Prepare('select id from progetto_concerto.concerti where codice = :codice and titolo = :titolo and descrizione = :descrizione and data_concerto = :data_concerto');
         $this->stmt->bindParam(':codice', $params['codice'], PDO::PARAM_STR);
         $this->stmt->bindParam(':titolo', $params['titolo'], PDO::PARAM_STR);
         $this->stmt->bindParam(':descrizione', $params['descrizione'], PDO::PARAM_STR);
-        $this->stmt->bindParam(':data_concerto', $params['data_concerto'], PDO::PARAM_STR);
+        $this->stmt->bindParam(':data_concerto', $str_data,PDO::PARAM_STR);
 
         $result = $this->__Fetch_All();
         if ($result) {
@@ -97,18 +96,21 @@ class dbManager
     }
     public function __Update(array $to_update, array $updated)
     {
-        $query = 'update from organizzazione_concerti.concerti set codice = :codice and titolo = :titolo and descrizione = :descrizione and data_concerto = :data_concerto
+        $str_data1 = $to_update['data_concerto'];
+        $str_data2 = $updated['data_concerto'];
+
+        $query = 'update organizzazione_concerti.concerti set codice = :codice, titolo = :titolo, descrizione = :descrizione, data_concerto = :data_concerto
         where codice = :codice2 and titolo = :titolo2 and descrizione = :descrizione2 and data_concerto = :data_concerto2';
-        $this->stmt = $this->__Prepare($query);
+        $this->__Prepare($query);
         $this->stmt->bindParam(':codice', $updated['codice'], PDO::PARAM_STR);
         $this->stmt->bindParam(':titolo', $updated['titolo'], PDO::PARAM_STR);
         $this->stmt->bindParam(':descrizione', $updated['descrizione'], PDO::PARAM_STR);
-        $this->stmt->bindParam(':data_concerto', $updated['data_concerto'], PDO::PARAM_STR);
+        $this->stmt->bindParam(':data_concerto',$str_data2,PDO::PARAM_STR);
 
         $this->stmt->bindParam(':codice2', $to_update['codice'], PDO::PARAM_STR);
         $this->stmt->bindParam(':titolo2', $to_update['titolo'], PDO::PARAM_STR);
         $this->stmt->bindParam(':descrizione2', $to_update['descrizione'], PDO::PARAM_STR);
-        $this->stmt->bindParam(':data_concerto2', $to_update['data_concerto'], PDO::PARAM_STR);
+        $this->stmt->bindParam(':data_concerto2', $str_data1,PDO::PARAM_STR);
         
         return $this->__Execute();
     }
