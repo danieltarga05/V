@@ -14,39 +14,39 @@ class Concerto
         $this->__Set_Descrizione($descrizione);
         $this->__Set_Data_Concerto($data_concerto);
     }
-    private function __Set_Id($var)
+    private function __Set_Id($var) //metodo per il setting dell'id del concerto
     {
         $this->id = $var;
     }
-    public function __Get_Id()
+    public function __Get_Id() //metodo per il getting dell'id del concerto
     {
         return $this->id;
     }
-    public function __Set_Codice($var)
+    public function __Set_Codice($var) //metodo per il setting del codice identificativo del concerto
     {
         $this->codice = $var;
     }
-    public function __Get_Codice()
+    public function __Get_Codice() //metodo per il getting del codice identificativo del concerto
     {
         return $this->codice;
     }
-    public function __Set_Titolo($var)
+    public function __Set_Titolo($var) //metodo per il setting del titolo del concerto
     {
         $this->titolo = $var;
     }
-    public function __Get_Titolo()
+    public function __Get_Titolo() //metodo per il getting del titolo del concerto
     {
         return $this->titolo;
     }
-    public function __Set_Descrizione($var)
+    public function __Set_Descrizione($var) //metodo per il setting della descrizione del concerto
     {
         $this->descrizione = $var;
     }
-    public function __Get_Descrizione()
+    public function __Get_Descrizione() //metodo per il getting della descrizione del concerto
     {
         return $this->descrizione;
     }
-    public function __Set_Data_Concerto($var)
+    public function __Set_Data_Concerto($var) //metodo per il setting della data del concerto
     {
         $dateTimeObj = $var;
         if ($dateTimeObj == null) {
@@ -54,113 +54,112 @@ class Concerto
         }
         $this->data_concerto = $dateTimeObj;
     }
-    public function __Get_Data_Concerto()
+    public function __Get_Data_Concerto() //metodo per il getting della data del concerto
     {
         return $this->data_concerto;
     }
-    public static function Create(array $params = [])
+    public static function Create(array $params = []) //metodo per creare un record all'interno della tabella del database : ritorna l'id del record appena creato
     {
-        $db = new dbManager('config.txt');
-        $db->__Connessione();
+        $db = new dbManager('config.txt'); //classe utilizzata per gestire il database organizzazione_concerti
+        $db->__Connessione(); //metodo per la connessione al database tramite PDO
 
         if ($db->__Insert_Into($params)) {
-            $id = $db->__Last_Insert_Id();
+            $id = $db->__Last_Insert_Id(); //settaggio del ritorno : verrà impostato in base all'ultimo id creato nella tabella
             $db->__Close(); //chiusura connessione
             return $id;
         }
-        $db->__Close();
+        $db->__Close(); //chiusura connessione
         return false;
     }
-    public static function Find(int $id) //Tramite un id viene ritornato il corrispondente record
+    public static function Find(int $id) //metodo per la dircerca di un record tramite il suo id : verrà ritornato il corrispondente record
     {
-        $db = new dbManager("config.txt");
-        $db->__Connessione();
-        if ($db->__Find($id)) {
-            $fetch = $db->__Fetch_Next();
-            $db->__Close();
+        $db = new dbManager("config.txt");  //classe utilizzata per gestire il database organizzazione_concerti
+        $db->__Connessione(); //metodo per la connessione al database tramite PDO
+        if ($db->__Find($id)) { //metodo per la ricerca dell'oggetto tramite id all'interno della tabella concerti
+            $fetch = $db->__Fetch_Next(); //metodo per il 'fetch' del primo record trovato in seguito ad una determinata query
+            $db->__Close(); //chiusura connessione
             $new = new Concerto(@$fetch['codice'], @$fetch['titolo'], @$fetch['descrizione'], @$fetch['data_concerto']);
-            $new->__Set_Id($id);
-            return $new;
+            $new->__Set_Id($id);//settaggio dell'id 
+            return $new; 
         }
-        $db->__Close();
+        $db->__Close(); //chiusura connessione
         return false;
     }
-    public static function FindAll()
+    public static function FindAll()//metodo per mostrare all'utente tutti i record all'interno della tabella concerti : verrà ritornarto un array di concerti
     {
-        $db = new dbManager('config.txt');
-        $db->__Connessione();
-        if ($concerti = $db->__Find_All()) {
-            $db->__Close();
+        $db = new dbManager('config.txt'); //classe utilizzata per gestire il database organizzazione_concerti
+        $db->__Connessione(); //metodo per la connessione al database tramite PDO
+        if ($concerti = $db->__Find_All()) { //metodo del dbManager per ritornare tutti i record all'interno della tabella concerti
+            $db->__Close();//chiusura connessione
             return $concerti;
         }
-        $db->__Close();
+        $db->__Close();//chiusura connessione
         return [];
     }
-    public function __Delete()
+    public function __Delete() //metodo per l'eliminazione di un record dalla tabella concerti
     {
-        $db = new dbManager("config.txt");
-        $db->__Connessione();
-        $concerto = Concerto::Find($this->__Get_Id());
+        $db = new dbManager("config.txt"); //classe utilizzata per gestire il database organizzazione_concerti
+        $db->__Connessione(); //metodo per la connessione al database tramite PDO
+        $concerto = Concerto::Find($this->__Get_Id()); //metodo per la ricerca dell'oggetto tramite id all'interno della tabella concerti
         $id = $concerto->__Get_Id();
         if ($result = $db->__Delete($id)) {
-            $db->__Close();
+            $db->__Close();//chiusura connessione
             return $result;
         }
         $db->__Close();
         return false;
     }
-    private function Validate_Id()
+    private function Validate_Id() //metodo di controllo per la validità dell'id di un record
     {
-        $db = new dbManager("config.txt");
-        $db->__Connessione();
-        $params = [
+        $db = new dbManager("config.txt"); //classe utilizzata per gestire il database organizzazione_concerti
+        $db->__Connessione(); //metodo per la connessione al database tramite PDO
+        $params = [ //array chiave-valore utilizzato per la selezione e quindi ricerca dell'id
             'codice' => $this->__Get_Codice(),
             'titolo' => $this->__Get_Titolo(),
             'descrizione' => $this->__Get_Descrizione(),
             'data_concerto' => $this->__Get_Data_Concerto()
         ];
-        if ($id = $db->__Select_Id($params)) {
-            echo 'Validate ID : ' . $id . PHP_EOL;
-            $db->__Close();
+        if ($id = $db->__Select_Id($params)) { //metodo per la ricerca dell'id all'interno della tabella
+            $db->__Close();//chiusra connessione
             return $id;
         }
-        $db->__Close();
+        $db->__Close();//chiusura connessione
         return false;
     }
-    public function __Update(array $params)
+    public function __Update(array $params)//metodo utilizzato per modificare un record con una nuova configurazione presente in $params
     {
-        $new = $this->__Set_New($params);
-        $db = new dbManager("config.txt");
-        $db->__Connessione();
+        $new = $this->__Set_New($params);//settaggio del nuovo record
+        $db = new dbManager("config.txt"); //classe utilizzata per gestire il database organizzazione_concerti
+        $db->__Connessione(); //metodo per la connessione al database tramite PDO
 
-        $to_update = [
+        $to_update = [ //array chiave-valore utilizzato per la selezione e quindi modifica del record
             'codice' => $this->__Get_Codice(),
             'titolo' => $this->__Get_Titolo(),
             'descrizione' => $this->__Get_Descrizione(),
             'data_concerto' => $this->__Get_Data_Concerto()
         ];
         
-        $updated = [
+        $updated = [//array chiave-valore utilizzato per la selezione e quindi ricerca dell'id
             'codice' => $new->__Get_Codice(),
             'titolo' => $new->__Get_Titolo(),
             'descrizione' => $new->__Get_Descrizione(),
             'data_concerto' => $new->__Get_Data_Concerto()
         ];
 
-        if ($db->__Update($to_update, $updated)) {
+        if ($db->__Update($to_update, $updated)) { //metodo che all'interno del database sovrascriverà il nuovo record
             $this->__Set_Codice($updated['codice']);
             $this->__Set_Titolo($updated['titolo']);
             $this->__Set_Descrizione($updated['descrizione']);
             $this->__Set_Data_Concerto($updated['data_concerto']);
-            $db->__Close();
+            $db->__Close();//chiusura connessione
             return true;
         }
-        $db->__Close();
+        $db->__Close(); //chiusura connessione
         return false;
     }
-    private function __Set_New(array $params)
+    private function __Set_New(array $params) //metodo utilizzato per il settaggio del nuovo record
     {
-        $updated = Concerto::Find($this->__Get_Id());
+        $updated = Concerto::Find($this->__Get_Id()); //metodo per la ricerca dell'oggetto tramite id all'interno della tabella concerti
         if (!empty($params['codice'])) {
             $updated->__Set_Codice($params['codice']);
         }
@@ -175,14 +174,14 @@ class Concerto
         }
         return $updated;
     }
-    public function __Show()
+    public function __Show() //metodo per mostrare all'utente un record della tabella concerti : verrà tornata una stringa impostata in base agli attributi
     {
-        $show = Concerto::Find($this->__Get_Id());
+        $show = Concerto::Find($this->__Get_Id()); //metodo per la ricerca dell'oggetto tramite id all'interno della tabella concerti
 
         return "ID : " . $show->__Get_Id() . " - CODICE : " . $show->__Get_Codice() . "- TITOLO : " . $show->__Get_Descrizione() . " - DESCRIZIONE : " . $show->__Get_Descrizione() . " - DATA CONCERTO : " . $show->__Get_Data_Concerto();
     }
 }
-function create()
+function create() //funzione utilizzata per l'implementazione del metodo create in un menu a riga di comando
 {
     echo "Inserisci codice  : ";
     while (empty($codice)) {
@@ -216,7 +215,7 @@ function create()
     }
     echo "Record non creato" . PHP_EOL;
 }
-function update()
+function update() //funzione utilizzata per l'implementazione del metodo update su menu a riga di comando
 {
     echo "inserisci id del record da modificare : ";
     $id = readline();
@@ -262,17 +261,17 @@ function update()
     }
     echo 'ID non esistente' . PHP_EOL;
 }
-function find()
+function find() //funzione utilizzata per l'implementazione del metodo find su menu a riga di comando
 {
     echo "inserisci id : ";
     $id = readline();
-    if (Concerto::Find($id)) {
+    if (Concerto::Find($id)) { //metodo per la ricerca dell'oggetto tramite id all'interno della tabella concerti
         echo "ID presente in concerti." . PHP_EOL;
         return;
     }
     echo "ID non esistente" . PHP_EOL;
 }
-function find_all()
+function find_all() //funzione utilizzata per l'implementazione del metodo find_all su menu a riga di comando
 {
     $concerti = Concerto::FindAll();
     foreach ($concerti as $a) {
@@ -294,7 +293,7 @@ function delete() //funzione per l'implementazione del metodo d'istanza Delete()
     }
     echo "ID non esistente" . PHP_EOL;
 }
-function show()
+function show() //funzione utilizzata per l'implementazione del metodo show su menu a riga di comando
 {
     echo "inserisci id : ";
     $id = readline();
@@ -305,7 +304,7 @@ function show()
     echo "ID non esistente." . PHP_EOL;
 }
 
-while (1) {
+while (1) { //menu a riga di comando
     echo "1 - Crea record" . PHP_EOL;
     echo "2 - Modifica record" . PHP_EOL;
     echo "3 - Mostra record" . PHP_EOL;
@@ -319,22 +318,22 @@ while (1) {
         case 0:
             exit("Chiusura programma...");
         case 1:
-            create(); //funziona
+            create();
             break;
         case 2:
-            update(); //funziona
+            update();
             break;
         case 3:
-            find(); //funziona
+            find();
             break;
         case 4:
-            find_all(); //?
+            find_all();
             break;
         case 5:
-            delete(); //?
+            delete();
             break;
         case 6:
-            show();//
+            show();
             break;
     }
 }

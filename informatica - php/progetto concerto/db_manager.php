@@ -1,5 +1,5 @@
 <?php
-class dbManager
+class dbManager //classe utilizzata per gestire il database organizzazione_concerti
 {
     private $host;
     private $dbname;
@@ -7,7 +7,7 @@ class dbManager
     private $password;
     private $connessione;
     private $stmt;
-    public function __construct($filepath)
+    public function __construct($filepath) //metodo costruttore della classe dbManager : verrà impostata la connessione al database in base al file di configurazione
     {
         $files = file($filepath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         $this->host = $files[0];
@@ -15,7 +15,7 @@ class dbManager
         $this->user = $files[2];
         $this->password = $files[3];
     }
-    public function __Connessione()
+    public function __Connessione() //metodo per la connessione al database tramite PDO
     {
         try {
             $this->connessione = new PDO("mysql:dbname={$this->dbname};host={$this->host}", $this->user, $this->password);
