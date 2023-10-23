@@ -318,7 +318,7 @@ while (1) {
             create(); //funziona
             break;
         case 2:
-            update(); //funziona ma problemi riga 83
+            update(); //funziona
             break;
         case 3:
             find(); //funziona
@@ -327,7 +327,7 @@ while (1) {
             find_all(); //?
             break;
         case 5:
-            delete();
+            delete(); //funzione
             break;
         case 6:
             show();
