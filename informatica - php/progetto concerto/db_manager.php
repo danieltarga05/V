@@ -67,6 +67,7 @@ class dbManager
     {
         $this->__Connessione();
         $this->__Prepare("delete from organizzazione_concerti.concerti where id = :id");
+        echo $id . PHP_EOL;
         $this->stmt->bindParam(":id", $id, PDO::PARAM_INT);
 
         return $this->__Execute();
@@ -74,23 +75,19 @@ class dbManager
     public function __Select_Id(array $params)
     {
         $this->__Connessione();
-        if(!is_string($params['data_concerto']))
-        {
+        if (!is_string($params['data_concerto'])) {
             $str_data = $params['data_concerto']->format('Y-m-d H:i:s');
-        }
-        else
-        {
+        } else {
             $str_data = $params['data_concerto'];
         }
-
         $this->__Prepare('select id from organizzazione_concerti.concerti where codice = :codice and titolo = :titolo and descrizione = :descrizione and data_concerto = :data_concerto');
         $this->stmt->bindParam(':codice', $params['codice'], PDO::PARAM_STR);
         $this->stmt->bindParam(':titolo', $params['titolo'], PDO::PARAM_STR);
         $this->stmt->bindParam(':descrizione', $params['descrizione'], PDO::PARAM_STR);
         $this->stmt->bindParam(':data_concerto', $str_data, PDO::PARAM_STR);
 
-        $result = $this->__Fetch_Assoc();
-        if ($result) {
+        if ($result = $this->__Fetch_Next()) {
+            echo 'id trovato in select ' . $result['id'];
             return $result['id'];
         }
         return false;
@@ -108,16 +105,13 @@ class dbManager
         $str_data1 = $to_update['data_concerto'];
 
         $data2 = $updated['data_concerto'];
-        if(is_string($data2))//si verifica che il value presente sia una stringa, e quindi non modificata in precedenza
+        if (is_string($data2)) //si verifica che il value presente sia una stringa, e quindi non modificata in precedenza
         {
             $str_data2 = $str_data1;
-        }
-        else
-        {
+        } else {
             $str_data2 = $data2->format('Y-m-d H:i:s');
         }
-        
-        
+
         $query = 'update organizzazione_concerti.concerti set codice = :codice, titolo = :titolo, descrizione = :descrizione, data_concerto = :data_concerto
         where codice = :codice2 and titolo = :titolo2 and descrizione = :descrizione2 and data_concerto = :data_concerto2';
         $this->__Prepare($query);

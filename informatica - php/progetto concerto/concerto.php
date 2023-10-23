@@ -20,7 +20,7 @@ class Concerto
     }
     public function __Get_Id()
     {
-        return self::Validate_Id($this);
+        return $this->id;
     }
     public function __Set_Codice($var)
     {
@@ -75,11 +75,11 @@ class Concerto
     {
         $db = new dbManager("config.txt");
         $db->__Connessione();
-
         if ($db->__Find($id)) {
             $fetch = $db->__Fetch_Next();
             $db->__Close();
             $new = new Concerto(@$fetch['codice'], @$fetch['titolo'], @$fetch['descrizione'], @$fetch['data_concerto']);
+            $new->__Set_Id($id);
             return $new;
         }
         $db->__Close();
@@ -102,7 +102,6 @@ class Concerto
         $db->__Connessione();
         $concerto = Concerto::Find($this->__Get_Id());
         $id = $concerto->__Get_Id();
-
         if ($result = $db->__Delete($id)) {
             $db->__Close();
             return $result;
@@ -110,17 +109,18 @@ class Concerto
         $db->__Close();
         return false;
     }
-    private static function Validate_Id(Concerto $concerto)
+    private function Validate_Id()
     {
         $db = new dbManager("config.txt");
         $db->__Connessione();
         $params = [
-            'codice' => $concerto->__Get_Codice(),
-            'titolo' => $concerto->__Get_Titolo(),
-            'descrizione' => $concerto->__Get_Descrizione(),
-            'data_concerto' => $concerto->__Get_Data_Concerto()
+            'codice' => $this->__Get_Codice(),
+            'titolo' => $this->__Get_Titolo(),
+            'descrizione' => $this->__Get_Descrizione(),
+            'data_concerto' => $this->__Get_Data_Concerto()
         ];
         if ($id = $db->__Select_Id($params)) {
+            echo 'Validate ID : ' . $id . PHP_EOL;
             $db->__Close();
             return $id;
         }
@@ -179,7 +179,7 @@ class Concerto
     {
         $show = Concerto::Find($this->__Get_Id());
 
-        return "ID : " . $show->__Get_Id() . " - CODICE : " . $show->__Get_Codice() . "- TITOLO : " . $show->__Get_Descrizione() . " - DESCRIZIONE : " . $show->__Get_Descrizione() . " - DATA CONCERTO : {$show->__Get_Data_Concerto()->format("Y m d")}";
+        return "ID : " . $show->__Get_Id() . " - CODICE : " . $show->__Get_Codice() . "- TITOLO : " . $show->__Get_Descrizione() . " - DESCRIZIONE : " . $show->__Get_Descrizione() . " - DATA CONCERTO : " . $show->__Get_Data_Concerto();
     }
 }
 function create()
@@ -267,7 +267,7 @@ function find()
     echo "inserisci id : ";
     $id = readline();
     if (Concerto::Find($id)) {
-        echo "ID presente in concerti" . PHP_EOL;
+        echo "ID presente in concerti." . PHP_EOL;
         return;
     }
     echo "ID non esistente" . PHP_EOL;
@@ -279,14 +279,18 @@ function find_all()
         echo $a->__Get_Codice() . ' ' . $a->__Get_Titolo() . ' ' . $a->__Get_Data_Concerto()->format('Y m d') . PHP_EOL;
     }
 }
-function delete()
+function delete() //funzione per l'implementazione del metodo d'istanza Delete() della classe Concerto su menu a riga di comando
 {
-    echo "inserisci id : ";
+    echo "inserisci id : "; //richiesta in input dell'id del record che si vuole eliminare
     $id = readline();
-    if ($concerto = Concerto::Find($id)) {
-        $concerto->__Delete();
-        echo 'Record eliminato.' . PHP_EOL;
-        return;
+    if ($concerto= Concerto::Find($id)) { //se il record viene trovato (quindi $concerto = Concerto::Find($id) sara diverso da FALSE, inizia il processo di delete)
+        if($concerto->__Delete()) //se il record viene effettivamente eliminato, viene comunicato all'utente
+        {
+            echo 'Record eliminato.' . PHP_EOL;
+            return;
+        }
+        echo 'Record non eliminato.' . PHP_EOL;
+        return; 
     }
     echo "ID non esistente" . PHP_EOL;
 }
@@ -327,10 +331,10 @@ while (1) {
             find_all(); //?
             break;
         case 5:
-            delete(); //funzione
+            delete(); //?
             break;
         case 6:
-            show();
+            show();//
             break;
     }
 }
