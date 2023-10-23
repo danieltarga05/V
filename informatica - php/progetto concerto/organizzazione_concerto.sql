@@ -1,6 +1,6 @@
-create database organizzazione_concerti;
+create database if not exists organizzazione_concerti;
 
-create table organizzazione_concerti.concerti
+create table if not exists organizzazione_concerti.concerti
 (
 	id int not null auto_increment primary key,
 	codice varchar(5),

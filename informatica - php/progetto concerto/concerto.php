@@ -307,10 +307,10 @@ function show() //funzione utilizzata per l'implementazione del metodo show su m
 while (1) { //menu a riga di comando
     echo "1 - Crea record" . PHP_EOL;
     echo "2 - Modifica record" . PHP_EOL;
-    echo "3 - Mostra record" . PHP_EOL;
+    echo "3 - Cerca record" . PHP_EOL;
     echo "4 - Mostra concerti" . PHP_EOL;
     echo "5 - Cancella record" . PHP_EOL;
-    echo "6 - Cerca record" . PHP_EOL;
+    echo "6 - Mostra record" . PHP_EOL;
     echo "0 - Chiudi" . PHP_EOL;
     echo "Scegli opzione : ";
     $option = readline();
