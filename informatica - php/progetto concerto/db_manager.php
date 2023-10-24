@@ -13,7 +13,7 @@ class dbManager //classe utilizzata per gestire il database organizzazione_conce
         $this->host = $files[0];
         $this->dbname = $files[1];
         $this->user = $files[2];
-        $this->password = $files[3];
+        $this->password = "";
     }
     public function __Connessione() //metodo per la connessione al database tramite PDO
     {
@@ -39,17 +39,21 @@ class dbManager //classe utilizzata per gestire il database organizzazione_conce
     {
         return $this->connessione->lastInsertId();
     }
-    public function __Find(int $id)
+    public function __Find($id)
     {
         $this->__Connessione();
         $this->__Prepare('select * from organizzazione_concerti.concerti where id = :id');
         $this->stmt->bindParam(":id", $id, PDO::PARAM_INT);
 
-        return $this->__Execute();
+        if(!$this->__Execute())
+        {
+            return false;
+        }
+        return $this->__Fetch_Next();
     }
     public function __Fetch_Next()
     {
-        return $this->stmt->fetch(PDO::F);
+        return $this->stmt->fetch(PDO::FETCH_OBJ);
     }
     public function __Find_All()
     {
@@ -57,9 +61,15 @@ class dbManager //classe utilizzata per gestire il database organizzazione_conce
         $i = 0;
         $this->__Connessione();
         $this->__Prepare('select * from organizzazione_concerti.concerti');
-        $obj = $this->__Fetch_All();
-        foreach ($obj as $record) {
-            $concerti[$i++] = new Concerto($record['codice'], $record['titolo'], $record['descrizione'], $record['data_concerto']);
+        if(!$this->__Execute())
+        {
+            return false;
+        }
+
+        while($row = $this->__Fetch_Next())
+        {
+            $tmp = concerto::Find($row->id);
+            $concerti[$i++] = $tmp;
         }
         return $concerti;
     }
@@ -71,14 +81,6 @@ class dbManager //classe utilizzata per gestire il database organizzazione_conce
 
         return $this->__Execute();
     }
-    public function __Fetch_Assoc()
-    {
-        return $this->stmt->fetch(PDO::FETCH_ASSOC);
-    }
-    public function __Fetch_All()
-    {
-        return $this->stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
     public function __Update(array $to_update, array $updated)
     {
         $str_data1 = $to_update['data_concerto'];
@@ -88,7 +90,7 @@ class dbManager //classe utilizzata per gestire il database organizzazione_conce
         {
             $str_data2 = $str_data1;
         } else {
-            $str_data2 = $data2->format('Y-m-d H:i:s');
+            $str_data2 = $data2->format('Y-m-d');
         }
 
         $query = 'update organizzazione_concerti.concerti set codice = :codice, titolo = :titolo, descrizione = :descrizione, data_concerto = :data_concerto
@@ -117,20 +119,6 @@ class dbManager //classe utilizzata per gestire il database organizzazione_conce
     public function __Close()
     {
         $this->connessione = null;
-    }
-
-    public function __Check_Code(string $codice)
-    {
-        $this->__Prepare("select count(*) from organizzazione_concerti.concerti where codice = :codice");
-        $this->stmt->bindParam(":codice", $codice);
-
-        if(!$this->__Execute())
-        {
-            return false;
-        }
-
-        $fetch = $this->__Fetch_Next();
-
     }
 }
 ?>
