@@ -49,7 +49,7 @@ class dbManager //classe utilizzata per gestire il database organizzazione_conce
     }
     public function __Fetch_Next()
     {
-        return $this->stmt->fetch();
+        return $this->stmt->fetch(PDO::F);
     }
     public function __Find_All()
     {
@@ -67,30 +67,9 @@ class dbManager //classe utilizzata per gestire il database organizzazione_conce
     {
         $this->__Connessione();
         $this->__Prepare("delete from organizzazione_concerti.concerti where id = :id");
-        echo $id . PHP_EOL;
         $this->stmt->bindParam(":id", $id, PDO::PARAM_INT);
 
         return $this->__Execute();
-    }
-    public function __Select_Id(array $params)
-    {
-        $this->__Connessione();
-        if (!is_string($params['data_concerto'])) {
-            $str_data = $params['data_concerto']->format('Y-m-d H:i:s');
-        } else {
-            $str_data = $params['data_concerto'];
-        }
-        $this->__Prepare('select id from organizzazione_concerti.concerti where codice = :codice and titolo = :titolo and descrizione = :descrizione and data_concerto = :data_concerto');
-        $this->stmt->bindParam(':codice', $params['codice'], PDO::PARAM_STR);
-        $this->stmt->bindParam(':titolo', $params['titolo'], PDO::PARAM_STR);
-        $this->stmt->bindParam(':descrizione', $params['descrizione'], PDO::PARAM_STR);
-        $this->stmt->bindParam(':data_concerto', $str_data, PDO::PARAM_STR);
-
-        if ($result = $this->__Fetch_Next()) {
-            echo 'id trovato in select ' . $result['id'];
-            return $result['id'];
-        }
-        return false;
     }
     public function __Fetch_Assoc()
     {
@@ -138,6 +117,20 @@ class dbManager //classe utilizzata per gestire il database organizzazione_conce
     public function __Close()
     {
         $this->connessione = null;
+    }
+
+    public function __Check_Code(string $codice)
+    {
+        $this->__Prepare("select count(*) from organizzazione_concerti.concerti where codice = :codice");
+        $this->stmt->bindParam(":codice", $codice);
+
+        if(!$this->__Execute())
+        {
+            return false;
+        }
+
+        $fetch = $this->__Fetch_Next();
+
     }
 }
 ?>
