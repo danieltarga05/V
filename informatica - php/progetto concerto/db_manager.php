@@ -41,12 +41,25 @@ class dbManager //classe utilizzata per gestire il database organizzazione_conce
         $str_data = $params['data_concerto']->format("Y-m-d"); //conversione in stringa della data del concerto
         $this->__Prepare('insert into organizzazione_concerti.concerti(codice,titolo,descrizione,data_concerto) 
         values (:codice,:titolo,:descrizione,:data_concerto)'); //metodo per la preparazione della query da eseguire
+        if($this->__Check_Code($params['codice'])>0) {//controllo dell'univocità del codice identificativo che si vuole inserire
+            return false;
+        }
         $this->stmt->bindParam(':codice', $params['codice'], PDO::PARAM_STR); //binding del parametro desiderato
         $this->stmt->bindParam(':titolo', $params['titolo'], PDO::PARAM_STR); //binding del parametro desiderato
         $this->stmt->bindParam(':descrizione', $params['descrizione'], PDO::PARAM_STR); //binding del parametro desiderato
         $this->stmt->bindParam(':data_concerto', $str_data, PDO::PARAM_STR); //binding del parametro desiderato
 
         return $this->__Execute(); //viene ritornato l'esito dell'esecuzione della query eseguita
+    }
+    private function __Check_Code($codice)//metodo utilizzato all'interno delle query di creazione e di modifica per controllare l'univocità del codice identificativo di un record
+    {
+        $this->__Connessione(); //connessione al database
+        $this->__Prepare("select count(*) as conta from organizzazione_concerti.concerti where codice = :codice");//preparazione della query da eseguire
+        $this->stmt->bindParam(":codice", $codice, PDO::PARAM_STR);//binding del parametro desiderato
+        if (!$this->__Execute()) { //viene controllato l'esito della query eseguita
+            return false;
+        }
+        return $this->__Fetch_Next()->conta;//viene ritornato il valore all'interno della colonna creata a nome 'conta'
     }
     public function __Last_Insert_Id() //metodo utilizzato per trovare l'id dell'ultimo record inserito all'interno del database
     {
@@ -56,7 +69,7 @@ class dbManager //classe utilizzata per gestire il database organizzazione_conce
     {
         $this->__Connessione(); //connessione al database
         $this->__Prepare('select * from organizzazione_concerti.concerti where id = :id'); //preparazione della query da eseguire
-        $this->stmt->bindParam(":id", $id, PDO::PARAM_INT); //binding del parametro desiderato
+        $this->stmt->bindParam(":id", $id, PDO::PARAM_INT);//binding del parametro desiderato
         if (!$this->__Execute()) { //viene controllato l'esito della query eseguita
             return false;
         }
@@ -98,6 +111,9 @@ class dbManager //classe utilizzata per gestire il database organizzazione_conce
             $str_data2 = $str_data1;
         } else {
             $str_data2 = $data2->format('Y-m-d');
+        }
+        if(strcmp($to_update['codice'],$updated['codice'])!=0 && $this->__Check_Code($updated['codice'])>0) {//controllo dell'univocità del codice identificativo che si vuole inserire
+            return false;
         }
         $this->__Connessione(); //connessione al database
         $this->__Prepare('update organizzazione_concerti.concerti set codice = :codice, titolo = :titolo, descrizione = :descrizione, data_concerto = :data_concerto
