@@ -74,11 +74,11 @@ class Concerto
     }
     public static function Find($id) //metodo per la dircerca di un record tramite il suo id : verrà ritornato il corrispondente record
     {
-        $db = new dbManager("config.txt");  //classe utilizzata per gestire il database organizzazione_concerti
+        $db = new dbManager("config.txt"); //classe utilizzata per gestire il database organizzazione_concerti
         $db->__Connessione(); //metodo per la connessione al database tramite PDO
         if ($fetch = $db->__Find($id)) { //metodo per la ricerca dell'oggetto tramite id all'interno della tabella concerti
-            $new = new Concerto(strval($fetch->codice), strval($fetch->titolo), strval($fetch->descrizione), strval($fetch->data_concerto));//creazione di un oggetto tramite gli attributi dell'ultimo oggetto "raccolto", fetchato
-            $new->__Set_Id($fetch->id);//settaggio dell'id 
+            $new = new Concerto(strval($fetch->codice), strval($fetch->titolo), strval($fetch->descrizione), strval($fetch->data_concerto)); //creazione di un oggetto tramite gli attributi dell'ultimo oggetto "raccolto", fetchato
+            $new->__Set_Id($fetch->id); //settaggio dell'id 
             $db->__Close(); //chiusura connessione
             return $new; //ritorno dell'oggetto trovato
         }
@@ -103,38 +103,38 @@ class Concerto
         $concerto = Concerto::Find($this->__Get_Id()); //metodo per la ricerca dell'oggetto tramite id all'interno della tabella concerti
         $id = $concerto->__Get_Id();
         if ($result = $db->__Delete($id)) {
-            $db->__Close();//chiusura connessione
+            $db->__Close(); //chiusura connessione
             return $result;
         }
         $db->__Close();
         return false;
     }
-    public function __Update(array $params)//metodo utilizzato per modificare un record con una nuova configurazione presente in $params
+    public function __Update(array $params) //metodo utilizzato per modificare un record con una nuova configurazione presente in $params
     {
-        $new = $this->__Set_New($params);//settaggio del nuovo record
+        $new = $this->__Set_New($params); //settaggio del nuovo record
         $db = new dbManager("config.txt"); //classe utilizzata per gestire il database organizzazione_concerti
         $db->__Connessione(); //metodo per la connessione al database tramite PDO
 
-        $to_update = [ //array chiave-valore utilizzato per la selezione e quindi modifica del record
+        $to_update = [
+            //array chiave-valore utilizzato per la selezione e quindi modifica del record
             'codice' => $this->__Get_Codice(),
             'titolo' => $this->__Get_Titolo(),
             'descrizione' => $this->__Get_Descrizione(),
             'data_concerto' => $this->__Get_Data_Concerto()
         ];
-        
-        $updated = [//array chiave-valore utilizzato per la selezione e quindi ricerca dell'id
+        $updated = [
+            //array chiave-valore utilizzato per la selezione e quindi ricerca dell'id
             'codice' => $new->__Get_Codice(),
             'titolo' => $new->__Get_Titolo(),
             'descrizione' => $new->__Get_Descrizione(),
             'data_concerto' => $new->__Get_Data_Concerto()
         ];
-
         if ($db->__Update($to_update, $updated)) { //metodo che all'interno del database sovrascriverà il nuovo record
             $this->__Set_Codice($updated['codice']);
             $this->__Set_Titolo($updated['titolo']);
             $this->__Set_Descrizione($updated['descrizione']);
             $this->__Set_Data_Concerto($updated['data_concerto']);
-            $db->__Close();//chiusura connessione
+            $db->__Close(); //chiusura connessione
             return true;
         }
         $db->__Close(); //chiusura connessione
@@ -166,33 +166,34 @@ class Concerto
 function create() //metodo utilizzata per l'implementazione del metodo create in un menu a riga di comando
 {
     echo "Inserisci codice  : ";
-    while (empty($codice)) {//controllo di validià della stringa in input, verrà richiesta finché non è ritenuta valida
+    while (empty($codice)) { //controllo di validià della stringa in input, verrà richiesta finché non è ritenuta valida
         $codice = readline();
     }
     echo "Inserisci titolo : ";
-    while (empty($titolo)) {//controllo di validià della stringa in input, verrà richiesta finché non è ritenuta valida
+    while (empty($titolo)) { //controllo di validià della stringa in input, verrà richiesta finché non è ritenuta valida
         $titolo = readline();
     }
     echo "Inserisci descrizione : ";
-    while (empty($descrizione)) {//controllo di validià della stringa in input, verrà richiesta finché non è ritenuta valida
+    while (empty($descrizione)) { //controllo di validià della stringa in input, verrà richiesta finché non è ritenuta valida
         $descrizione = readline();
     }
     echo "Inserisci data : ";
-    while (empty($data)) {//controllo di validià della stringa in input, verrà richiesta finché non è ritenuta valida
+    while (empty($data)) { //controllo di validià della stringa in input, verrà richiesta finché non è ritenuta valida
         $data = readline();
         $dateTimeObj = DateTime::createFromFormat("Y-m-d", $data);
         if ($dateTimeObj == null) {
             $dateTimeObj = new DateTime();
         }
     }
-    $params = [//creazione di una nuova configurazione da inserire
+    $params = [
+        //creazione di una nuova configurazione da inserire
         'codice' => $codice,
         'titolo' => $titolo,
         'descrizione' => $descrizione,
         'data_concerto' => $dateTimeObj
     ];
-    if (Concerto::Create($params)) {//verrà quindi creato un record nella tabella concerti grazie alla configurazione inserita dall'utente
-        echo "Record creato.\n";//se il record viene effettivamente inserito, viene comunicato all'utente
+    if (Concerto::Create($params)) { //verrà quindi creato un record nella tabella concerti grazie alla configurazione inserita dall'utente
+        echo "Record creato.\n"; //se il record viene effettivamente inserito, viene comunicato all'utente
         return;
     }
     echo "Record non creato.\n";
@@ -211,41 +212,37 @@ function update() //metodo utilizzata per l'implementazione del metodo update su
 {
     echo "inserisci id del record da modificare : ";
     $id = readline(); //richiesta in input dell'id del record che si vuole modificare
-    if ($concerto = Concerto::Find($id)) {//se il record rispettivo viene trovato, inizia il processo di update
+    if ($concerto = Concerto::Find($id)) { //se il record rispettivo viene trovato, inizia il processo di update
         echo "Inserisci nuovo codice  : ";
         $codice = readline();
-        if(empty($codice))//controllo di validià della stringa in input, se non valida verrà utilizzato l'attributo originale
-        {
+        if (empty($codice)) { //controllo di validià della stringa in input, se non valida verrà utilizzato l'attributo originale
             $codice = $concerto->__Get_Codice();
         }
         echo "Inserisci titolo : ";
         $titolo = readline();
-        if(empty($titolo))//controllo di validià della stringa in input, se non valida verrà utilizzato l'attributo originale
-        {
+        if (empty($titolo)) { //controllo di validià della stringa in input, se non valida verrà utilizzato l'attributo originale
             $titolo = $concerto->__Get_Titolo();
         }
         echo "Inserisci descrizione : ";
         $descrizione = readline();
-        if(empty($descrizione))//controllo di validià della stringa in input, se non valida verrà utilizzato l'attributo originale
-        {
+        if (empty($descrizione)) { //controllo di validià della stringa in input, se non valida verrà utilizzato l'attributo originale
             $descrizione = $concerto->__Get_Descrizione();
         }
         echo "Inserisci data : ";
         $data = readline();
         $dateTimeObj = DateTime::createFromFormat('Y-m-d', $data);
-        if($dateTimeObj == null)//controllo di validià della stringa in input, se non valida verrà utilizzato l'attributo originale
-        {
-            $dateTimeObj = $concerto->__Get_Data_Concerto(); 
+        if ($dateTimeObj == null) { //controllo di validià della stringa in input, se non valida verrà utilizzato l'attributo originale
+            $dateTimeObj = $concerto->__Get_Data_Concerto();
         }
-        
-        $params = [ //creazione di una nuova configurazione da utilizzare
+
+        $params = [
+            //creazione di una nuova configurazione da utilizzare
             'codice' => $codice,
             'titolo' => $titolo,
             'descrizione' => $descrizione,
             'data_concerto' => $dateTimeObj
         ];
-
-        if ($concerto->__Update($params)) {//verrà quindi sovrascritto il record stesso utilizzando la nuova configurazione richiesta su linea di comando
+        if ($concerto->__Update($params)) { //verrà quindi sovrascritto il record stesso utilizzando la nuova configurazione richiesta su linea di comando
             echo "Record modificato.\n"; //se il record viene effettivamente modificato, viene comunicato all'utente
             return;
         }
@@ -256,23 +253,22 @@ function update() //metodo utilizzata per l'implementazione del metodo update su
 }
 function delete() //metodo per l'implementazione della metodo d'istanza Delete() della classe Concerto su menu a riga di comando
 {
-    echo 'inserisci id : '; 
+    echo 'inserisci id : ';
     $id = readline(); //richiesta in input dell'id del record che si vuole eliminare
-    if ($concerto= Concerto::Find($id)) { //se il record viene trovato, inizia il processo di delete
-        if($concerto->__Delete()) //se il record viene effettivamente eliminato, viene comunicato all'utente
-        {
+    if ($concerto = Concerto::Find($id)) { //se il record viene trovato, inizia il processo di delete
+        if ($concerto->__Delete()) { //se il record viene effettivamente eliminato, viene comunicato all'utente
             echo "record eliminato.\n";
             return;
         }
         echo "record non eliminabile.\n";
-        return; 
+        return;
     }
     echo "ID non esistente.\n";
 }
 function find_all() //metodo utilizzata per l'implementazione della metodo Find_All() della classe Concerto su menu a riga di comando
 {
     $concerti = Concerto::FindAll();
-    foreach ($concerti as $a) {//verranno stampate a video le stringhe preimpostate in modo da visualizzare tutti i dati dei concerti inseriti nel database
+    foreach ($concerti as $a) { //verranno stampate a video le stringhe preimpostate in modo da visualizzare tutti i dati dei concerti inseriti nel database
         echo $a->__Show() . PHP_EOL;
     }
 }
